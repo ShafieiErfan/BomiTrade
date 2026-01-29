@@ -1,0 +1,5 @@
+[{"id":1769696481813,"date":"1404/11/08","symbol":"طلای آبشده","capital":"2,300,000","quantity":"1","entry":"77,086","exit":"77,057","type":"Short","status":"profit","profit":"667,000","lines":"-29.0"}
+,{"id":1769696530013,"date":"1404/11/08","symbol":"طلای آبشده","capital":"2,300,000","quantity":"1","entry":"77,265","exit":"77,294","type":"Long","status":"profit","profit":"667,000","lines":"29.0"}
+,{"id":1769696555604,"date":"1404/11/08","symbol":"طلای آبشده","capital":"2,300,000","quantity":"1","entry":"77,168","exit":"77,131","type":"Short","status":"profit","profit":"851,000","lines":"-37.0"}
+,{"id":1769696595732,"date":"1404/11/08","symbol":"طلای آبشده","capital":"2,300,000","quantity":"1","entry":"77,216","exit":"77,186","type":"Long","status":"loss","profit":"-690,000","lines":"-30.0"}
+,{"id":1769696624124,"date":"1404/11/08","symbol":"طلای آبشده","capital":"2,300,000","quantity":"1","entry":"77,148","exit":"77,177","type":"Long","status":"profit","profit":"667,000","lines":"29.0"}]

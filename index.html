@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بومی‌ترید | تحلیل هوشمند معاملات</title>
+    <style>
+        /* تنظیمات فونت و متغیرها */
+        @font-face {
+            font-family: 'Estedad';
+            src: url('fonts/Estedad-Black.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        :root {
+            --bg-color: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --text-main: #ffffff;
+            --text-muted: #b0b0b0;
+            --accent: #d4af37; /* طلایی */
+            --accent-hover: #f9ce48;
+            --success: #00c853;
+            --danger: #ff3d00;
+            --glass-bg: rgba(20, 20, 20, 0.85);
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+        * { box-sizing: border-box; outline: none; scroll-behavior: smooth; }
+        body {
+            font-family: 'Estedad', Tahoma, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* --- هدر و ناوبری --- */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 20px 0;
+            transition: 0.4s;
+            background: transparent;
+        }
+        header.scrolled {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--accent);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo span { color: white; }
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            margin: 0;
+            padding: 0;
+        }
+        nav a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            position: relative;
+        }
+        nav a:hover { color: var(--accent); }
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            right: 0;
+            background: var(--accent);
+            transition: 0.3s;
+        }
+        nav a:hover::after { width: 100%; }
+
+        /* --- بخش اصلی (Hero) --- */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1611974765270-ca12586343bb?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 20px;
+            position: relative;
+        }
+        .hero-content {
+            max-width: 800px;
+            animation: fadeInUp 1s ease-out;
+        }
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+        }
+        .btn {
+            padding: 12px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
+        }
+
+        /* --- بخش آمار --- */
+        .stats-section {
+            padding: 80px 20px;
+            background: var(--bg-color);
+            position: relative;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            color: var(--accent);
+        }
+        .stats-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+        }
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-color: var(--accent);
+        }
+        .stat-label {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+        .stat-value.profit { color: var(--success); text-shadow: 0 0 10px rgba(0,200,83,0.3); }
+        .stat-value.loss { color: var(--danger); text-shadow: 0 0 10px rgba(255,61,0,0.3); }
+
+        /* --- بخش امکانات --- */
+        .features-section {
+            padding: 80px 20px;
+            background: #151515;
+        }
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        .feature-card {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: 0.3s;
+        }
+        .feature-card:hover {
+            background: #222;
+            transform: scale(1.02);
+        }
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: white;
+        }
+        .feature-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* --- فوتر --- */
+        footer {
+            background: #000;
+            padding: 40px 20px;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+        }
+        footer p { color: #666; margin: 0; }
+
+        /* --- انیمیشن‌ها --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- واکنش‌گرا (موبایل) --- */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .nav-container { flex-direction: column; gap: 15px; }
+            nav ul { gap: 15px; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- هدر -->
+    <header id="mainHeader">
+        <div class="nav-container">
+            <a href="#" class="logo">📈 <span>بومی‌ترید</span></a>
+            <nav>
+                <ul>
+                    <li><a href="#stats">آمار عملکرد</a></li>
+                    <li><a href="add.html">اضافه کردن معامله</a></li>
+                    <li><a href="data.html">معاملات</a></li>
+                    <li><a href="scalpCalc.html">ماشین حساب</a></li>
+                    <li><a href="vloume.html">مدیریت حجم</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- بخش اصلی (Hero) -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>تحلیل هوشمند معاملات طلا</h1>
+            <p>معامله‌گری حرفه‌ای را با بومی‌ترید تجربه کنید. ابزارهای تحلیل تکنیکال، مدیریت سرمایه و ژورنال‌نویسی پیشرفته، همگی در یک پلتفرم یکپارچه.</p>
+            <a href="#stats" class="btn btn-primary">مشاهده عملکرد من</a>
+        </div>
+    </section>
+
+    <!-- بخش آمار -->
+    <section id="stats" class="stats-section">
+        <h2 class="section-title">📊 عملکرد مالی شما</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">سود امروز</div>
+                <div class="stat-value" id="statToday">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">سود این هفته</div>
+                <div class="stat-value" id="statWeek">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">سود این ماه</div>
+                <div class="stat-value" id="statMonth">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">سود ۳ ماه گذشته</div>
+                <div class="stat-value" id="stat3Month">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">سود ۶ ماه گذشته</div>
+                <div class="stat-value" id="stat6Month">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">سود ۱ سال گذشته</div>
+                <div class="stat-value" id="stat1Year">0</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- بخش امکانات -->
+    <section id="features" class="features-section">
+        <h2 class="section-title">🚀 امکانات منحصر به فرد</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📈</div>
+                <div class="feature-title">تحلیل هوشمند</div>
+                <div class="feature-desc">تحلیل خودکار سبک معاملاتی شما، شناسایی نقاط ضعف و قوت با هوش مصنوعی.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">ماشین حساب اسکلپ</div>
+                <div class="feature-desc">محاسبه آنی استاپ لاس و تارگت‌های چندگانه برای معاملات سریع و اسکلپ.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <div class="feature-title">مدیریت سرمایه</div>
+                <div class="feature-desc">تعیین حجم دقیق معاملات بر اساس ریسک‌پذیری و سرمایه موجود برای جلوگیری از کال‌مارجین.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- فوتر -->
+    <footer id="about">
+        <p>© ۱۴۰۴ بومی‌ترید. تمامی حقوق محفوظ است.</p>
+    </footer>
+
+    <!-- بخش اسکریپت نهایی (جایگزین کنید) -->
+    <script>
+        // --- 1. مدیریت هدر استیکی ---
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('mainHeader');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // --- 2. تبدیل تاریخ میلادی به شمسی (برای فهمیدن امروز شمسی) ---
+        function toJalali(gy, gm, gd) {
+            const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+            let jy = (gy <= 1600) ? 0 : 979;
+            gy -= (gy <= 1600) ? 621 : 1600;
+            let gy2 = (gm > 2) ? (gy + 1) : gy;
+            let days = (365 * gy) + (Math.floor((gy2 + 3) / 4)) - (Math.floor((gy2 + 99) / 100)) + (Math.floor((gy2 + 399) / 400)) - 80 + gd + g_d_m[gm - 1];
+            jy += 33 * Math.floor(days / 12053);
+            days %= 12053;
+            jy += 4 * Math.floor(days / 1461);
+            days %= 1461;
+            jy += Math.floor((days - 1) / 365);
+            if (days > 365) days = (days - 1) % 365;
+            let jm = (days < 186) ? 1 + Math.floor(days / 31) : 7 + Math.floor((days - 186) / 30);
+            let jd = 1 + ((days < 186) ? (days % 31) : ((days - 186) % 30));
+            return { year: jy, month: jm, day: jd };
+        }
+
+        // --- 3. مقایسه رشته‌های تاریخ شمسی ---
+        // فرمت ورودی: "1403/10/29"
+        function compareJalaliDates(dateStr1, dateStr2) {
+            if (!dateStr1 || !dateStr2) return 0;
+            const d1 = dateStr1.split('/').map(Number);
+            const d2 = dateStr2.split('/').map(Number);
+            
+            // تبدیل به عدد برای مقایسه (مثلا 14031029)
+            const num1 = d1[0] * 10000 + d1[1] * 100 + d1[2];
+            const num2 = d2[0] * 10000 + d2[1] * 100 + d2[2];
+            
+            if (num1 < num2) return -1;
+            if (num1 > num2) return 1;
+            return 0;
+        }
+
+        // --- 4. محاسبه آمار ---
+        let trades = [];
+
+        function parseMoney(str) {
+            if (!str) return 0;
+            return parseFloat(str.toString().replace(/,/g, '')) || 0;
+        }
+
+        function calculateStats() {
+            const savedData = localStorage.getItem('goldTrades');
+            if (savedData) {
+                try {
+                    trades = JSON.parse(savedData);
+                } catch (e) {
+                    console.error("خطا در خواندن دیتا", e);
+                    trades = [];
+                }
+            } else {
+                console.log("داده‌ای یافت نشد.");
+                return;
+            }
+
+            // 1. پیدا کردن تاریخ امروز به شمسی
+            const now = new Date();
+            const jToday = toJalali(now.getFullYear(), now.getMonth() + 1, now.getDate());
+            const todayStr = `${jToday.year}/${jToday.month}/${jToday.day}`;
+
+            // 2. محاسبه شروع هفته شمسی (فرض: شنبه اول هفته)
+            // برای سادگی، ۶ روز از امروز کم میکنیم (تقریبی)
+            // برای دقیق بودن نیاز به کتابخانه jalaali-js است، اما اینجا دستی انجام میدهیم
+            const weekStartObj = new Date(now);
+            weekStartObj.setDate(now.getDate() - 6); // ۷ روز قبل
+            const jWeekStart = toJalali(weekStartObj.getFullYear(), weekStartObj.getMonth() + 1, weekStartObj.getDate());
+            const weekStartStr = `${jWeekStart.year}/${jWeekStart.month}/${jWeekStart.day}`;
+
+            // 3. محاسبه شروع ماه شمسی
+            const monthStartStr = `${jToday.year}/${jToday.month}/01`;
+
+            // 4. محاسبه ۳ ماه قبل (ساده شده: فقط ماه را کم میکنیم)
+            let m3 = jToday.month - 3;
+            let y3 = jToday.year;
+            if (m3 <= 0) { m3 += 12; y3 -= 1; }
+            const month3StartStr = `${y3}/${m3}/01`;
+
+            // 5. محاسبه ۶ ماه قبل
+            let m6 = jToday.month - 6;
+            let y6 = jToday.year;
+            if (m6 <= 0) { m6 += 12; y6 -= 1; }
+            const month6StartStr = `${y6}/${m6}/01`;
+
+            // 6. محاسبه ۱ سال قبل
+            const year1StartStr = `${jToday.year - 1}/01/01`;
+
+            const periods = {
+                'statToday': todayStr,
+                'statWeek': weekStartStr,
+                'statMonth': monthStartStr,
+                'stat3Month': month3StartStr,
+                'stat6Month': month6StartStr,
+                'stat1Year': year1StartStr
+            };
+
+            for (const [id, startDateStr] of Object.entries(periods)) {
+                let total = 0;
+                trades.forEach(t => {
+                    // مقایسه رشته‌ای تاریخ شمسی
+                    // اگر تاریخ معامله بزرگتر یا مساوی شروع بازه بود
+                    if (compareJalaliDates(t.date, startDateStr) >= 0) {
+                        total += parseMoney(t.profit);
+                    }
+                });
+
+                const el = document.getElementById(id);
+                if (el) {
+                    el.innerText = total.toLocaleString();
+                    el.className = 'stat-value ' + (total >= 0 ? 'profit' : 'loss');
+                }
+            }
+        }
+
+        // --- 5. تابع افزودن داده تست ---
+        function addTestData() {
+            // دریافت تاریخ امروز شمسی واقعی
+            const now = new Date();
+            const jToday = toJalali(now.getFullYear(), now.getMonth() + 1, now.getDate());
+            const todayStr = `${jToday.year}/${jToday.month}/${jToday.day}`;
+
+            const dummyTrade = {
+                id: Date.now(),
+                date: todayStr, 
+                symbol: "XAUUSD",
+                type: "Long",
+                entry: "2800",
+                exit: "2810",
+                quantity: "1",
+                status: "profit",
+                profit: "5000000" 
+            };
+
+            const existing = JSON.parse(localStorage.getItem('goldTrades') || "[]");
+            existing.push(dummyTrade);
+            localStorage.setItem('goldTrades', JSON.stringify(existing));
+            
+            alert(`یک معامله تست با تاریخ امروز (${todayStr}) اضافه شد.`);
+            calculateStats();
+        }
+
+        // اجرای اولیه
+        document.addEventListener('DOMContentLoaded', () => {
+            calculateStats();
+            window.addTestData = addTestData;
+        });
+    </script>
+</body>
+</html>

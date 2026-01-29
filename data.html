@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت و تحلیل داده‌ها - ژورنال طلا</title>
+    <style>
+            @font-face {
+            font-family: 'Estedad';
+            src: url('fonts/Estedad-Black.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --input-bg: #2c2c2c;
+            --text-main: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --accent: #d4af37;
+            --success: #00c853;
+            --danger: #ff3d00;
+            --border-radius: 12px;
+        }
+        * { box-sizing: border-box; outline: none; }
+        body {
+            font-family: 'Estedad';
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            border: 1px solid #333;
+        }
+        /* هدر */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .stats-cards {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            background: var(--input-bg);
+            padding: 15px 20px;
+            border-radius: 8px;
+            min-width: 140px;
+            text-align: center;
+            border: 1px solid #444;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .stat-value { font-size: 1.2rem; font-weight: bold; margin-top: 5px; }
+        .stat-sub { font-size: 0.75rem; color: #777; margin-top: 2px; }
+        .text-success { color: var(--success); }
+        .text-danger { color: var(--danger); }
+        /* --- بخش مدیریت سرمایه --- */
+        .mm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            align-items: start;
+        }
+        .mm-input-group {
+            background: #252525;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        .mm-result-box {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid var(--accent);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 160px;
+        }
+        .mm-label { font-size: 0.9rem; color: #aaa; margin-bottom: 8px; display: block; }
+        .mm-input {
+            width: 100%; background: var(--input-bg); border: 1px solid #555;
+            color: white; padding: 10px; border-radius: 6px; margin-bottom: 10px; font-family: inherit;
+        }
+        .mm-input:focus { border-color: var(--accent); }
+        .mm-big-value { font-size: 2.2rem; font-weight: bold; color: var(--accent); margin: 10px 0; }
+        .mm-sub-text { font-size: 0.85rem; color: #888; }
+        .risk-warning {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255, 61, 0, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            display: none;
+        }
+        .exposure-info {
+            margin-top: 10px;
+            padding: 8px;
+            background: rgba(0, 200, 83, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            display: none;
+        }
+        /* آمار پیشرفته */
+        .advanced-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .adv-stat-box {
+            background: #252525;
+            padding: 15px;
+            border-radius: 8px;
+            border-right: 4px solid #555;
+            transition: 0.3s;
+        }
+        .adv-stat-box:hover { transform: translateY(-3px); background: #2a2a2a; }
+        .adv-stat-box.good { border-right-color: var(--success); }
+        .adv-stat-box.bad { border-right-color: var(--danger); }
+        .adv-stat-box.neutral { border-right-color: var(--accent); }
+        .adv-title { font-size: 0.85rem; color: #aaa; margin-bottom: 8px; }
+        .adv-value { font-size: 1.3rem; font-weight: bold; color: white; }
+        .adv-desc { font-size: 0.75rem; color: #777; margin-top: 5px; }
+        /* نمودار */
+        .chart-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
+            margin-top: 20px;
+            background: #181818;
+            border-radius: 8px;
+            border: 1px solid #333;
+            padding: 10px;
+            overflow: hidden;
+        }
+        svg { width: 100%; height: 100%; overflow: visible; }
+        .chart-line { 
+            fill: none; 
+            stroke: var(--accent); 
+            stroke-width: 3; 
+            stroke-linecap: round; 
+            stroke-linejoin: round;
+            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.6));
+        }
+        .chart-area { fill: url(#goldGradient); stroke: none; }
+        
+        /* استایل تولتیپ */
+        .chart-tooltip { 
+            position: fixed; 
+            background: rgba(30, 30, 30, 0.95); 
+            color: white; 
+            padding: 12px; 
+            border-radius: 8px; 
+            font-size: 0.85rem; 
+            pointer-events: none; 
+            display: none; 
+            border: 1px solid var(--accent); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            z-index: 1000;
+            min-width: 160px;
+            backdrop-filter: blur(4px);
+            transform: translate(15px, -50%);
+        }
+        .tooltip-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        .tooltip-title {
+            font-weight: bold;
+            color: var(--accent);
+            border-bottom: 1px solid #444;
+            padding-bottom: 4px;
+            margin-bottom: 6px;
+            display: block;
+        }
+        /* کنترل‌ها */
+        .analysis-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+            background: #252525;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        input, select { background: var(--input-bg); border: 1px solid #444; color: white; padding: 10px; border-radius: 8px; width: 100%; font-family: inherit; }
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; font-family: inherit; transition: 0.2s; }
+        .btn-primary { background: var(--accent); color: #000; }
+        .btn-outline { background: transparent; border: 1px solid #555; color: #ccc; }
+        /* تقویم */
+        .calendar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; margin-top: 15px; }
+        .day-card { background: var(--input-bg); border: 1px solid #444; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .day-card:hover { transform: translateY(-2px); }
+        .day-card.active { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+        .bg-profit { background: rgba(0, 200, 83, 0.15); border-color: var(--success); }
+        .bg-loss { background: rgba(255, 61, 0, 0.15); border-color: var(--danger); }
+        .text-profit { color: var(--success); }
+        .text-loss { color: var(--danger); }
+        /* جدول */
+        .table-container { overflow-x: auto; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th { text-align: right; padding: 12px; color: var(--text-muted); border-bottom: 2px solid #333; }
+        td { padding: 12px; border-bottom: 1px solid #333; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+        .badge-long { background: rgba(0, 200, 83, 0.15); color: #00c853; }
+        .badge-short { background: rgba(255, 61, 0, 0.15); color: #ff3d00; }
+        .btn-delete { background: none; border: none; color: #666; cursor: pointer; font-size: 1.2rem; }
+        .btn-delete:hover { color: var(--danger); }
+        #fileInput { display: none; }
+        .empty-msg { text-align: center; color: #555; padding: 40px; }
+        
+        /* --- NEW: استایل برای نمودار روزانه --- */
+        .daily-chart-container {
+            display: none; /* پیش‌فرض مخفی */
+            border: 1px solid var(--accent);
+            background: #1a1a1a;
+        }
+        .daily-chart-container.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chart-line-daily {
+            fill: none;
+            stroke: var(--success);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* --- استایل‌های جدید برای تصاویر --- */
+        .table-thumb {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 6px;
+            cursor: zoom-in;
+            border: 1px solid #444;
+            transition: transform 0.2s;
+            display: block;
+        }
+        .table-thumb:hover {
+            transform: scale(1.1);
+            border-color: var(--accent);
+        }
+        .no-image {
+            color: #555;
+            font-size: 0.8rem;
+        }
+        .lightbox-img-link {
+            display: inline-block;
+            margin-top: 5px;
+            font-size: 0.75rem;
+            color: var(--accent);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .lightbox-img-link:hover {
+            color: #fff;
+        }
+
+        /* --- استایل کول‌آپ (Lightbox) --- */
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .lightbox-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 85vh;
+            border-radius: 4px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            animation: zoomIn 0.3s ease;
+            border: 1px solid #444;
+        }
+        .close-lightbox {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 50px;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+            z-index: 2001;
+        }
+        .close-lightbox:hover {
+            color: var(--danger);
+        }
+        @keyframes zoomIn {
+            from {transform:scale(0.9); opacity: 0;} 
+            to {transform:scale(1); opacity: 1;}
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- هدر -->
+    <div class="header-section">
+        <h1 style="margin:0; color:var(--accent)">تحلیل و مدیریت معاملات</h1>
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div style="color:var(--text-muted); font-size:0.8rem">خالص سود/ضرر</div>
+                <div class="stat-value" id="netPnl">0</div>
+            </div>
+            <div class="stat-card">
+                <div style="color:var(--text-muted); font-size:0.8rem">نرخ برد</div>
+                <div class="stat-value" id="winRate">0%</div>
+            </div>
+            <div class="stat-card">
+                <div style="color:var(--text-muted); font-size:0.8rem">تعداد معاملات</div>
+                <div class="stat-value" id="totalCount">0</div>
+                <div class="stat-sub" id="tradeTypeBreakdown" style="display:none; margin-top:5px; border-top:1px solid #444; padding-top:5px;">
+                    <span class="text-success">لانگ: <span id="longCount">0</span></span> | 
+                    <span class="text-danger">شورت: <span id="shortCount">0</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- بخش تحلیل هوشمند -->
+    <div class="card" style="border-color: var(--accent);">
+        <h3 style="margin:0 0 10px 0; color:var(--accent);">💡 تحلیل هوشمند</h3>
+        <div id="smartAnalysisText" style="color: #ccc; font-size: 0.95rem;">
+            هنوز داده‌ای برای تحلیل وجود ندارد.
+        </div>
+    </div>
+    <!-- بخش مدیریت سرمایه -->
+    <div class="card">
+        <h3 style="margin:0 0 15px 0; color:white;">ماشین حساب مدیریت سرمایه</h3>
+        <div class="mm-grid">
+            <div class="mm-input-group">
+                <label class="mm-label">سرمایه کل (تومان)</label>
+                <input type="number" id="mmCapital" class="mm-input" placeholder="مثلا: 100000000" oninput="calculateMM()">
+                <label class="mm-label">درصد ریسک در این معامله (%)</label>
+                <input type="number" id="mmRiskPercent" class="mm-input" value="2" step="0.5" oninput="calculateMM()">
+                <label class="mm-label">استاپ لاس (تفاوت قیمت ورود و خروج)</label>
+                <input type="number" id="mmStopLoss" class="mm-input" placeholder="مثلا: 5000" oninput="calculateMM()">
+                <label class="mm-label">ارزش هر واحد (تومان)</label>
+                <input type="number" id="mmUnitValue" class="mm-input" placeholder="مثلا: 2300000" oninput="calculateMM()">
+            </div>
+            <div class="mm-result-box">
+                <div style="color:#aaa; font-size:0.9rem">حداکثر حجم مجاز (واحد)</div>
+                <div class="mm-big-value" id="mmResult">-</div>
+                <div class="mm-sub-text" id="mmRiskAmount">مقدار پول در خطر: 0 تومان</div>
+                <div id="mmExposure" class="exposure-info"></div>
+                <div id="mmWarning" class="risk-warning"></div>
+            </div>
+        </div>
+    </div>
+    <!-- بخش آمار پیشرفته -->
+    <div class="card">
+        <h3 style="margin:0 0 15px 0; color:white;">تحلیل عمیق و روانشناسی بازار</h3>
+        <div class="advanced-stats-grid">
+            <div class="adv-stat-box neutral" id="boxRR">
+                <div class="adv-title">ضریب سود به ضرر (R/R)</div>
+                <div class="adv-value" id="valRR">-</div>
+                <div class="adv-desc">میانگین سود تقسیم بر میانگین ضرر</div>
+            </div>
+            <div class="adv-stat-box good">
+                <div class="adv-title">طولانی‌ترین روند برد</div>
+                <div class="adv-value text-success" id="valWinStreak">0</div>
+                <div class="adv-desc">معامله</div>
+            </div>
+            <div class="adv-stat-box bad">
+                <div class="adv-title">طولانی‌ترین روند باخت</div>
+                <div class="adv-value text-danger" id="valLossStreak">0</div>
+                <div class="adv-desc">معامله (هشدار تیلت)</div>
+            </div>
+            <div class="adv-stat-box good">
+                <div class="adv-title">بهترین معامله</div>
+                <div class="adv-value text-success" id="valBestTrade">0</div>
+                <div class="adv-desc">بیشترین سود تک معامله</div>
+            </div>
+            <div class="adv-stat-box bad">
+                <div class="adv-title">بدترین معامله</div>
+                <div class="adv-value text-danger" id="valWorstTrade">0</div>
+                <div class="adv-desc">بیشترین ضرر تک معامله</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- --- NEW: بخش نمودار روزانه (پنهان تا زمانی که روزی انتخاب شود) --- -->
+    <div class="card daily-chart-container" id="dailyChartCard">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h3 style="margin:0; color:var(--success);">📅 نمودار روند روزانه: <span id="dailyChartDateLabel"></span></h3>
+            <button class="btn btn-outline" style="font-size:0.8rem; padding:5px 10px;" onclick="closeDailyChart()">بستن</button>
+        </div>
+        <div class="chart-container" style="height: 250px; border-color: var(--success);">
+            <div id="tooltipDaily" class="chart-tooltip"></div>
+            <svg id="dailyChartSvg" preserveAspectRatio="none"></svg>
+        </div>
+    </div>
+    <!-- بخش نمودار اصلی -->
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h3 style="margin:0; color:white;">نمودار عملکرد کلی (Equity Curve)</h3>
+        </div>
+        <div class="analysis-controls">
+            <div><label style="font-size:0.8rem; color:#aaa; display:block; margin-bottom:5px;">از تاریخ</label><input type="text" id="startDate" placeholder="1403/10/01"></div>
+            <div><label style="font-size:0.8rem; color:#aaa; display:block; margin-bottom:5px;">تا تاریخ</label><input type="text" id="endDate" placeholder="1403/10/30"></div>
+            <div style="display:flex; align-items:flex-end;"><button class="btn btn-primary" style="width:100%" onclick="applyDateFilter()">اعمال فیلتر</button></div>
+            <div style="display:flex; align-items:flex-end;"><button class="btn btn-outline" style="width:100%" onclick="resetFilters()">نمایش کل تاریخ</button></div>
+        </div>
+        <div class="chart-container" id="chartContainer">
+            <div id="tooltip" class="chart-tooltip"></div>
+            <svg id="equityChart" preserveAspectRatio="none">
+                <defs>
+                    <linearGradient id="goldGradient" x1="0" x2="0" y1="0" y2="1">
+                        <stop offset="0%" stop-color="#d4af37" stop-opacity="0.4"/>
+                        <stop offset="100%" stop-color="#d4af37" stop-opacity="0"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+    </div>
+    <!-- بخش تقویم -->
+    <div class="card" >
+        <div style="display:flex; justify-content:space-between; align-items:center; ">
+            <h3 style="margin:0; color:white;">نمای روزانه</h3>
+            <button class="btn btn-outline" style="font-size:0.8rem; padding:5px 10px;" onclick="resetCalendarFilter()">همه روزها</button>
+        </div>
+        <div class="calendar-grid" style="display: flex;" id="calendarGrid"></div>
+    </div>
+    <!-- جدول -->
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h3 style="margin:0; color:white;">جزئیات معاملات</h3>
+            <div style="display:flex; gap:10px;">
+                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">بارگذاری فایل</button>
+                <button class="btn btn-outline" onclick="clearData()">پاک کردن</button>
+                <input type="file" id="fileInput" accept=".json" onchange="uploadData(this)">
+            </div>
+        </div>
+        <div class="table-container">
+            <table id="mainTable">
+                <thead>
+                    <tr>
+                        <th>تصویر</th>
+                        <th>تاریخ</th>
+                        <th>نماد</th>
+                        <th>نوع</th>
+                        <th>(قیمت) ورود</th>
+                        <th>(قیمت) خروج</th>
+                        <th>تعداد</th>
+                        <th>وضعیت</th>
+                        <th>مبلغ</th>
+                        <th>حذف</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+            <div id="emptyState" class="empty-msg">داده‌ای برای نمایش وجود ندارد.</div>
+        </div>
+    </div>
+</div>
+
+<!-- المان کول‌آپ -->
+<div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
+    <span class="close-lightbox" onclick="closeLightbox(event)">&times;</span>
+    <img class="lightbox-content" id="lightboxImg">
+</div>
+
+<script>
+    let trades = [];
+    let filteredTrades = [];
+    let selectedDate = null;
+    
+    function parseMoney(str) {
+        if (!str) return 0;
+        return parseFloat(str.toString().replace(/,/g, '')) || 0;
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedCapital = localStorage.getItem('mmCapital');
+        if (savedCapital) document.getElementById('mmCapital').value = savedCapital;
+        const savedUnitValue = localStorage.getItem('mmUnitValue');
+        if (savedUnitValue) document.getElementById('mmUnitValue').value = savedUnitValue;
+        const savedData = localStorage.getItem('goldTrades');
+        if (savedData) {
+            trades = JSON.parse(savedData);
+            filteredTrades = [...trades];
+            updateAll();
+        }
+    });
+    function updateAll() {
+        renderCalendar();
+        renderTable(filteredTrades);
+        updateBasicStats(filteredTrades);
+        updateAdvancedStats(filteredTrades);
+        drawChart(filteredTrades);
+        updateSmartAnalysis(filteredTrades);
+    }
+    function updateSmartAnalysis(data) {
+        const textEl = document.getElementById('smartAnalysisText');
+        if (data.length === 0) {
+            textEl.innerHTML = 'هنوز داده‌ای برای تحلیل وجود ندارد.';
+            return;
+        }
+        let longPnl = 0, shortPnl = 0;
+        let longCount = 0, shortCount = 0;
+        data.forEach(t => {
+            const val = parseMoney(t.profit);
+            if (t.type === 'Long') {
+                longCount++;
+                longPnl += val;
+            } else if (t.type === 'Short') {
+                shortCount++;
+                shortPnl += val;
+            }
+        });
+        let message = '';
+        if (longPnl > shortPnl && longCount > 0) {
+            message = `📈 بهترین عملکرد شما در معاملات <strong style="color:var(--success)">لانگ</strong> بوده است (سود خالص: ${longPnl.toLocaleString()}).`;
+        } else if (shortPnl > longPnl && shortCount > 0) {
+            message = `📉 بهترین عملکرد شما در معاملات <strong style="color:var(--danger)">شورت</strong> بوده است (سود خالص: ${shortPnl.toLocaleString()}).`;
+        } else {
+            message = 'عملکرد شما در معاملات لانگ و شورت تقریباً برابر است.';
+        }
+        if (longCount > shortCount * 2) {
+            message += '<br>💡 نکته: شما تمایل زیادی به معاملات لانگ دارید.';
+        } else if (shortCount > longCount * 2) {
+            message += '<br>💡 نکته: شما تمایل زیادی به معاملات شورت دارید.';
+        }
+        textEl.innerHTML = message;
+    }
+    function calculateMM() {
+        const capital = parseFloat(document.getElementById('mmCapital').value);
+        const riskPercent = parseFloat(document.getElementById('mmRiskPercent').value);
+        const stopLoss = parseFloat(document.getElementById('mmStopLoss').value);
+        const unitValue = parseFloat(document.getElementById('mmUnitValue').value);
+        const resultEl = document.getElementById('mmResult');
+        const riskAmountEl = document.getElementById('mmRiskAmount');
+        const warningEl = document.getElementById('mmWarning');
+        const exposureEl = document.getElementById('mmExposure');
+        
+        if (capital) localStorage.setItem('mmCapital', capital);
+        if (unitValue) localStorage.setItem('mmUnitValue', unitValue);
+        
+        warningEl.style.display = 'none';
+        exposureEl.style.display = 'none';
+        
+        if (!capital || !riskPercent || !stopLoss || stopLoss <= 0) {
+            resultEl.innerText = "-";
+            riskAmountEl.innerText = "مقدار پول در خطر: 0 تومان";
+            if (stopLoss === 0) warningEl.style.display = 'block';
+            return;
+        }
+        
+        const riskAmount = capital * (riskPercent / 100);
+        let positionSize = riskAmount / stopLoss;
+        positionSize = Math.floor(positionSize);
+        
+        let totalPositionValue = 0;
+        let exposurePercent = 0;
+        let hasUnitValue = false;
+        if (unitValue && unitValue > 0) {
+            hasUnitValue = true;
+            totalPositionValue = positionSize * unitValue;
+            exposurePercent = (totalPositionValue / capital) * 100;
+        }
+        
+        resultEl.innerText = positionSize.toLocaleString();
+        riskAmountEl.innerText = `مقدار پول در خطر: ${Math.round(riskAmount).toLocaleString()} تومان`;
+        
+        if (hasUnitValue) {
+            if (totalPositionValue > capital) {
+                warningEl.innerText = `⚠️ سرمایه ناکافی! نیاز به ${totalPositionValue.toLocaleString()} تومان`;
+                warningEl.style.display = 'block';
+                resultEl.style.color = 'var(--danger)';
+            } else {
+                exposureEl.innerText = `ارزش کل پوزیشن: ${totalPositionValue.toLocaleString()} تومان (${exposurePercent.toFixed(1)}% سرمایه)`;
+                exposureEl.style.display = 'block';
+                resultEl.style.color = 'var(--accent)';
+            }
+        } else {
+            resultEl.style.color = 'var(--accent)';
+        }
+    }
+    function updateBasicStats(data) {
+        let net = 0, wins = 0;
+        let longCount = 0, shortCount = 0;
+        
+        data.forEach(t => {
+            const val = parseMoney(t.profit);
+            net += val;
+            if (val > 0) wins++;
+            if (t.type === 'Long') longCount++;
+            else if (t.type === 'Short') shortCount++;
+        });
+        
+        const wr = data.length ? ((wins/data.length)*100).toFixed(1) : 0;
+        const pnlEl = document.getElementById('netPnl');
+        pnlEl.innerText = net.toLocaleString();
+        pnlEl.className = 'stat-value ' + (net >= 0 ? 'text-success' : 'text-danger');
+        
+        document.getElementById('winRate').innerText = wr + '%';
+        document.getElementById('totalCount').innerText = data.length;
+        
+        const breakdownEl = document.getElementById('tradeTypeBreakdown');
+        if (data.length > 0) {
+            breakdownEl.style.display = 'block';
+            document.getElementById('longCount').innerText = longCount;
+            document.getElementById('shortCount').innerText = shortCount;
+        } else {
+            breakdownEl.style.display = 'none';
+        }
+    }
+    function updateAdvancedStats(data) {
+        if (data.length === 0) {
+            ['valRR', 'valWinStreak', 'valLossStreak', 'valBestTrade', 'valWorstTrade'].forEach(id => document.getElementById(id).innerText = '-');
+            return;
+        }
+        let totalWin = 0, winCount = 0, totalLoss = 0, lossCount = 0;
+        let bestTrade = -Infinity, worstTrade = Infinity;
+        
+        data.forEach(t => {
+            const val = parseMoney(t.profit);
+            if (val > 0) {
+                totalWin += val; winCount++;
+                if (val > bestTrade) bestTrade = val;
+            } else {
+                totalLoss += val; lossCount++;
+                if (val < worstTrade) worstTrade = val;
+            }
+        });
+        
+        const avgWin = winCount ? totalWin / winCount : 0;
+        const avgLoss = lossCount ? Math.abs(totalLoss) / lossCount : 0;
+        
+        let rrRatio = 0;
+        if (avgLoss > 0) rrRatio = avgWin / avgLoss;
+        else if (avgWin > 0) rrRatio = 999;
+        
+        const rrEl = document.getElementById('valRR');
+        rrEl.innerText = rrRatio === 999 ? '∞' : rrRatio.toFixed(2);
+        document.getElementById('boxRR').className = 'adv-stat-box ' + (rrRatio >= 1.5 ? 'good' : (rrRatio >= 1 ? 'neutral' : 'bad'));
+        
+        let currentWinStreak = 0, maxWinStreak = 0;
+        let currentLossStreak = 0, maxLossStreak = 0;
+        const sortedData = [...data].sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id);
+        
+        sortedData.forEach(t => {
+            const val = parseMoney(t.profit);
+            if (val > 0) {
+                currentWinStreak++; currentLossStreak = 0;
+                if (currentWinStreak > maxWinStreak) maxWinStreak = currentWinStreak;
+            } else {
+                currentLossStreak++; currentWinStreak = 0;
+                if (currentLossStreak > maxLossStreak) maxLossStreak = currentLossStreak;
+            }
+        });
+        
+        document.getElementById('valWinStreak').innerText = maxWinStreak;
+        document.getElementById('valLossStreak').innerText = maxLossStreak;
+        document.getElementById('valBestTrade').innerText = bestTrade === -Infinity ? 0 : bestTrade.toLocaleString();
+        document.getElementById('valWorstTrade').innerText = worstTrade === Infinity ? 0 : worstTrade.toLocaleString();
+    }
+    // --- 4. نمودار اصلی ---
+    function drawChart(data) {
+        const svg = document.getElementById('equityChart');
+        const tooltip = document.getElementById('tooltip');
+        svg.innerHTML = '';
+        
+        // تعریف گرادینت
+        const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+        defs.innerHTML = `
+            <linearGradient id="goldGradient" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stop-color="#d4af37" stop-opacity="0.4"/>
+                <stop offset="100%" stop-color="#d4af37" stop-opacity="0"/>
+            </linearGradient>
+        `;
+        svg.appendChild(defs);
+        if (data.length === 0) return;
+        
+        // محاسبه نقاط نمودار بر اساس داده‌های فیلتر شده
+        const sortedData = [...data].sort((a, b) => a.date.localeCompare(b.date));
+        const dailyPnl = {};
+        sortedData.forEach(t => {
+            if (!dailyPnl[t.date]) dailyPnl[t.date] = { pnl: 0, trades: [] };
+            const val = parseMoney(t.profit);
+            dailyPnl[t.date].pnl += val;
+            dailyPnl[t.date].trades.push(t);
+        });
+        
+        const dates = Object.keys(dailyPnl).sort((a, b) => a.localeCompare(b));
+        let cumulativePnl = 0;
+        const chartPoints = dates.map(date => {
+            cumulativePnl += dailyPnl[date].pnl;
+            return { date, value: cumulativePnl, trades: dailyPnl[date].trades };
+        });
+        
+        const width = svg.clientWidth || 800;
+        const height = svg.clientHeight || 350;
+        const padding = 20;
+        const values = chartPoints.map(p => p.value);
+        const maxVal = Math.max(...values, 0);
+        const minVal = Math.min(...values, 0);
+        const range = maxVal - minVal || 100;
+        
+        const getX = (index) => padding + (index / (chartPoints.length - 1 || 1)) * (width - 2 * padding);
+        const getY = (val) => height - padding - ((val - minVal) / range) * (height - 2 * padding);
+        
+        let pathD = `M ${getX(0)} ${getY(chartPoints[0].value)}`;
+        let areaD = `M ${getX(0)} ${height - padding} L ${getX(0)} ${getY(chartPoints[0].value)}`;
+        
+        chartPoints.forEach((p, i) => {
+            if (i === 0) return;
+            const x = getX(i);
+            const y = getY(p.value);
+            pathD += ` L ${x} ${y}`;
+            areaD += ` L ${x} ${y}`;
+        });
+        areaD += ` L ${getX(chartPoints.length - 1)} ${height - padding} Z`;
+        
+        const areaPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        areaPath.setAttribute("d", areaD);
+        areaPath.setAttribute("class", "chart-area");
+        svg.appendChild(areaPath);
+        
+        const linePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        linePath.setAttribute("d", pathD);
+        linePath.setAttribute("class", "chart-line");
+        svg.appendChild(linePath);
+        
+        // رسم نقاط تعاملی
+        chartPoints.forEach((p, i) => {
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            const cx = getX(i);
+            const cy = getY(p.value);
+            circle.setAttribute("cx", cx);
+            circle.setAttribute("cy", cy);
+            circle.setAttribute("r", 5);
+            circle.setAttribute("fill", "#121212");
+            circle.setAttribute("stroke", "#d4af37");
+            circle.setAttribute("stroke-width", 2);
+            circle.style.cursor = "pointer";
+            circle.style.transition = "all 0.2s";
+            circle.addEventListener('mouseenter', (e) => {
+                circle.setAttribute("r", 8);
+                circle.setAttribute("fill", "#d4af37");
+                
+                const dayTrades = p.trades;
+                const dayPnl = dayTrades.reduce((sum, t) => sum + parseMoney(t.profit), 0);
+                const pnlClass = dayPnl >= 0 ? 'text-success' : 'text-danger';
+                const pnlSign = dayPnl >= 0 ? '+' : '';
+                
+                tooltip.style.display = 'block';
+                tooltip.style.left = e.clientX + 15 + 'px';
+                tooltip.style.top = e.clientY + 'px';
+                
+                // بررسی وجود عکس برای نمایش در تولتیپ
+                let imageLinksHtml = '';
+                dayTrades.forEach(t => {
+                    if (t.image) {
+                        imageLinksHtml += `<div class="tooltip-row"><span class="lightbox-img-link" onclick="openLightbox('${t.image}')">📷 مشاهده تصویر (${t.symbol})</span></div>`;
+                    }
+                });
+
+                tooltip.innerHTML = `
+                    <span class="tooltip-title">${p.date}</span>
+                    <div class="tooltip-row">
+                        <span>تعداد معاملات:</span>
+                        <span style="font-weight:bold">${dayTrades.length}</span>
+                    </div>
+                    <div class="tooltip-row">
+                        <span>سود/ضرر روز:</span>
+                        <span class="${pnlClass}" style="font-weight:bold">${pnlSign}${dayPnl.toLocaleString()}</span>
+                    </div>
+                    <div class="tooltip-row" style="margin-top:4px; padding-top:4px; border-top:1px solid #444; font-size:0.8rem; color:#aaa;">
+                        <span>سود انباشته:</span>
+                        <span>${p.value.toLocaleString()}</span>
+                    </div>
+                    ${imageLinksHtml}
+                `;
+            });
+            
+            circle.addEventListener('mouseleave', () => {
+                circle.setAttribute("r", 5);
+                circle.setAttribute("fill", "#121212");
+                tooltip.style.display = 'none';
+            });
+            
+            svg.appendChild(circle);
+        });
+        
+        if (minVal < 0 && maxVal > 0) {
+            const zeroY = getY(0);
+            const zeroLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            zeroLine.setAttribute("x1", padding);
+            zeroLine.setAttribute("y1", zeroY);
+            zeroLine.setAttribute("x2", width - padding);
+            zeroLine.setAttribute("y2", zeroY);
+            zeroLine.setAttribute("stroke", "#555");
+            zeroLine.setAttribute("stroke-dasharray", "4");
+            svg.appendChild(zeroLine);
+        }
+    }
+    /* --- NEW: تابع رسم نمودار روزانه --- */
+    function drawDailyChart(date) {
+        const svg = document.getElementById('dailyChartSvg');
+        const tooltip = document.getElementById('tooltipDaily');
+        svg.innerHTML = '';
+        
+        // فیلتر کردن معاملات روز انتخاب شده
+        const dayTrades = trades.filter(t => t.date === date);
+        
+        if (dayTrades.length === 0) return;
+        // مرتب‌سازی معاملات بر اساس ID (ترتیب انجام معامله)
+        dayTrades.sort((a, b) => a.id - b.id);
+        let cumulativePnl = 0;
+        const chartPoints = dayTrades.map((t, index) => {
+            const val = parseMoney(t.profit);
+            cumulativePnl += val;
+            return { 
+                index: index + 1, 
+                value: cumulativePnl, 
+                symbol: t.symbol,
+                pnl: val,
+                image: t.image // اضافه کردن تصویر
+            };
+        });
+        const width = svg.clientWidth || 800;
+        const height = svg.clientHeight || 250;
+        const padding = 30;
+        const values = chartPoints.map(p => p.value);
+        const maxVal = Math.max(...values, 0);
+        const minVal = Math.min(...values, 0);
+        const range = maxVal - minVal || 100;
+        const getX = (index) => padding + (index / (chartPoints.length - 1 || 1)) * (width - 2 * padding);
+        const getY = (val) => height - padding - ((val - minVal) / range) * (height - 2 * padding);
+        let pathD = `M ${getX(0)} ${getY(chartPoints[0].value)}`;
+        
+        chartPoints.forEach((p, i) => {
+            if (i === 0) return;
+            const x = getX(i);
+            const y = getY(p.value);
+            pathD += ` L ${x} ${y}`;
+        });
+        const linePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        linePath.setAttribute("d", pathD);
+        linePath.setAttribute("class", "chart-line-daily");
+        svg.appendChild(linePath);
+        // رسم نقاط تعاملی
+        chartPoints.forEach((p, i) => {
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            const cx = getX(i);
+            const cy = getY(p.value);
+            circle.setAttribute("cx", cx);
+            circle.setAttribute("cy", cy);
+            circle.setAttribute("r", 4);
+            circle.setAttribute("fill", "#121212");
+            circle.setAttribute("stroke", "#00c853");
+            circle.setAttribute("stroke-width", 2);
+            circle.style.cursor = "pointer";
+            
+            circle.addEventListener('mouseenter', (e) => {
+                circle.setAttribute("r", 7);
+                circle.setAttribute("fill", "#00c853");
+                tooltip.style.display = 'block';
+                tooltip.style.left = e.clientX + 15 + 'px';
+                tooltip.style.top = e.clientY + 'px';
+                
+                const pnlClass = p.pnl >= 0 ? 'text-success' : 'text-danger';
+                const pnlSign = p.pnl >= 0 ? '+' : '';
+                
+                // لینک به تصویر در تولتیپ روزانه
+                let imageHtml = '';
+                if (p.image) {
+                    imageHtml = `<div class="tooltip-row"><span class="lightbox-img-link" onclick="openLightbox('${p.image}')">📷 مشاهده تصویر</span></div>`;
+                }
+
+                tooltip.innerHTML = `
+                    <span class="tooltip-title">معامله #${p.index}: ${p.symbol}</span>
+                    <div class="tooltip-row">
+                        <span>سود/ضرر:</span>
+                        <span class="${pnlClass}" style="font-weight:bold">${pnlSign}${p.pnl.toLocaleString()}</span>
+                    </div>
+                    <div class="tooltip-row" style="margin-top:4px; padding-top:4px; border-top:1px solid #444; font-size:0.8rem; color:#aaa;">
+                        <span>انباشته روز:</span>
+                        <span>${p.value.toLocaleString()}</span>
+                    </div>
+                    ${imageHtml}
+                `;
+            });
+            
+            circle.addEventListener('mouseleave', () => {
+                circle.setAttribute("r", 4);
+                circle.setAttribute("fill", "#121212");
+                tooltip.style.display = 'none';
+            });
+            
+            svg.appendChild(circle);
+        });
+        // خط صفر
+        if (minVal < 0 && maxVal > 0) {
+            const zeroY = getY(0);
+            const zeroLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            zeroLine.setAttribute("x1", padding);
+            zeroLine.setAttribute("y1", zeroY);
+            zeroLine.setAttribute("x2", width - padding);
+            zeroLine.setAttribute("y2", zeroY);
+            zeroLine.setAttribute("stroke", "#555");
+            zeroLine.setAttribute("stroke-dasharray", "4");
+            svg.appendChild(zeroLine);
+        }
+    }
+    // --- 5. فیلترها و تقویم ---
+    function applyDateFilter() {
+        const start = document.getElementById('startDate').value;
+        const end = document.getElementById('endDate').value;
+        filteredTrades = trades.filter(t => {
+            let match = true;
+            if (start && t.date < start) match = false;
+            if (end && t.date > end) match = false;
+            return match;
+        });
+        selectedDate = null;
+        closeDailyChart(); // بستن نمودار روزانه هنگام تغییر فیلتر کلی
+        updateAll();
+    }
+    function resetFilters() {
+        document.getElementById('startDate').value = '';
+        document.getElementById('endDate').value = '';
+        filteredTrades = [...trades];
+        selectedDate = null;
+        closeDailyChart();
+        updateAll();
+    }
+    function renderCalendar() {
+        const grid = document.getElementById('calendarGrid');
+        grid.innerHTML = '';
+        const daysData = {};
+        filteredTrades.forEach(trade => {
+            if (!daysData[trade.date]) daysData[trade.date] = { pnl: 0 };
+            const val = parseMoney(trade.profit);
+            daysData[trade.date].pnl += val;
+        });
+        const sortedDates = Object.keys(daysData).sort((a, b) => b.localeCompare(a));
+        sortedDates.forEach(date => {
+            const pnl = daysData[date].pnl;
+            const isProfit = pnl >= 0;
+            const card = document.createElement('div');
+            card.style.width = "130px"
+            card.className = `day-card ${isProfit ? 'bg-profit' : 'bg-loss'} ${selectedDate === date ? 'active' : ''}`;
+            card.onclick = () => selectDate(date);
+            card.innerHTML = `<div style="font-size:0.8rem; color:#ccc">${date}</div><div style="font-weight:bold; font-size:0.9rem" class="${isProfit ? 'text-profit' : 'text-loss'}">${isProfit ? '+' : ''}${pnl.toLocaleString()}</div>`;
+            grid.appendChild(card);
+        });
+    }
+    function selectDate(date) {
+        if (selectedDate === date) {
+            selectedDate = null; 
+            closeDailyChart();
+        } else {
+            selectedDate = date;
+            openDailyChart(date);
+        }
+        
+        if (selectedDate) {
+            const dayTrades = filteredTrades.filter(t => t.date === selectedDate);
+            renderTable(dayTrades);
+            updateBasicStats(dayTrades);
+        } else {
+            renderTable(filteredTrades);
+            updateBasicStats(filteredTrades);
+        }
+        renderCalendar();
+    }
+    
+    /* --- NEW: توابع کنترلی نمودار روزانه --- */
+    function openDailyChart(date) {
+        const card = document.getElementById('dailyChartCard');
+        const label = document.getElementById('dailyChartDateLabel');
+        label.innerText = date;
+        card.classList.add('active');
+        // کمی تاخیر برای اطمینان از رندر شدن کانتینر قبل از رسم SVG
+        setTimeout(() => {
+            drawDailyChart(date);
+        }, 50);
+    }
+    
+    function closeDailyChart() {
+        const card = document.getElementById('dailyChartCard');
+        card.classList.remove('active');
+    }
+    function resetCalendarFilter() {
+        selectedDate = null;
+        closeDailyChart();
+        renderTable(filteredTrades);
+        updateBasicStats(filteredTrades);
+        renderCalendar();
+    }
+    // --- 6. جدول ---
+    function renderTable(data) {
+        const tbody = document.getElementById('tableBody');
+        const empty = document.getElementById('emptyState');
+        tbody.innerHTML = '';
+        if (data.length === 0) { empty.style.display = 'block'; return; }
+        empty.style.display = 'none';
+        data.forEach(t => {
+            const tr = document.createElement('tr');
+            const statusClass = t.status === 'profit' ? 'text-success' : 'text-danger';
+            const typeClass = t.type === 'Long' ? 'badge-long' : 'badge-short';
+            
+            // سلول تصویر
+            let imageCell = '<td><span class="no-image">-</span></td>';
+            if (t.image) {
+                imageCell = `<td><img src="${t.image}" class="table-thumb" onclick="openLightbox('${t.image}')" alt="تصویر"></td>`;
+            }
+
+            tr.innerHTML = `
+                ${imageCell}
+                <td>${t.date}</td>
+                <td style="font-weight:bold">${t.symbol}</td>
+                <td><span class="badge ${typeClass}">${t.type}</span></td>
+                <td>${(t.entry)}</td>
+                <td>${(t.exit)}</td>
+                <td>${t.quantity}</td>
+                <td class="${statusClass}">${t.status === 'profit' ? 'سود' : 'ضرر'}</td>
+                <td class="${statusClass}">${t.profit}</td>
+                <td><button class="btn-delete" onclick="deleteTrade(${t.id})">×</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+    // --- مدیریت فایل ---
+    function uploadData(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const newTrades = JSON.parse(e.target.result);
+                if (Array.isArray(newTrades)) {
+                    trades = [...trades, ...newTrades];
+                } else {
+                    alert('فرمت فایل نامعتبر است. فایل باید شامل یک لیست (آرایه) از معاملات باشد.');
+                    return;
+                }
+                filteredTrades = [...trades];
+                localStorage.setItem('goldTrades', JSON.stringify(trades));
+                resetFilters();
+                alert(`فایل با موفقیت اضافه شد. مجموع ${newTrades.length} معامله به لیست اضافه گردید.`);
+            } catch(err) {
+                console.error(err);
+                alert('خطا در خواندن فایل. لطفاً از صحت فرمت JSON اطمینان حاصل کنید.');
+            }
+        };
+        reader.readAsText(file);
+        input.value = '';
+    }
+    function deleteTrade(id) {
+        if(confirm('حذف شود؟')) {
+            trades = trades.filter(t => t.id !== id);
+            filteredTrades = filteredTrades.filter(t => t.id !== id);
+            localStorage.setItem('goldTrades', JSON.stringify(trades));
+            // اگر روزی باز است، آپدیت شود
+            if(selectedDate) {
+                drawDailyChart(selectedDate);
+            }
+            updateAll();
+        }
+    }
+    function clearData() {
+        if(confirm('همه پاک شود؟')) {
+            trades = []; filteredTrades = [];
+            localStorage.removeItem('goldTrades');
+            closeDailyChart();
+            updateAll();
+        }
+    }
+
+    // --- توابع کول‌آپ (Lightbox) ---
+    function openLightbox(src) {
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightboxImg');
+        lightbox.style.display = 'flex';
+        lightboxImg.src = src;
+    }
+
+    function closeLightbox(event) {
+        // بستن فقط اگر روی دکمه ضربدر یا پس‌زمینه کلیک شد (نه روی خود عکس)
+        if (event.target.id === 'lightbox' || event.target.classList.contains('close-lightbox')) {
+            document.getElementById('lightbox').style.display = 'none';
+        }
+    }
+</script>
+</body>
+</html>

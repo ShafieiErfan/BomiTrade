@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ماشین حساب حجم پیشرفته (اصلاح شده)</title>
+<style>
+@font-face {
+  font-family: 'Estedad';
+  src: url('fonts/Estedad-Black.ttf') format('truetype');
+}
+:root {
+  --bg:#121212;
+  --card:#1e1e1e;
+  --input:#2c2c2c;
+  --text:#e0e0e0;
+  --muted:#aaa;
+  --accent:#d4af37;
+  --success:#00c853;
+  --danger:#ff3d00;
+}
+* { box-sizing:border-box; outline:none; }
+body {
+  margin:0;
+  padding:20px;
+  font-family:Estedad,Tahoma,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  display:flex;
+  justify-content:center;
+  min-height:100vh;
+}
+.container { max-width:800px; width:100%; }
+.card {
+  background:var(--card);
+  padding:25px;
+  border-radius:12px;
+  border:1px solid #333;
+  box-shadow:0 4px 20px rgba(0,0,0,0.4);
+}
+h1 { text-align:center; color:var(--accent); margin:0 0 20px 0; }
+h2 { font-size:1.1rem; color:#fff; margin:15px 0 10px 0; border-bottom:1px solid #333; padding-bottom:5px; }
+
+.input-group { margin-bottom:15px; }
+label { display:block; margin-bottom:6px; color:var(--muted); font-size:0.9rem; }
+input, select {
+  width:100%;
+  padding:12px;
+  background:var(--input);
+  border:1px solid #444;
+  color:#fff;
+  border-radius:8px;
+  font-family:inherit;
+}
+input:focus, select:focus { border-color:var(--accent); }
+
+.btn-row { display:flex; gap:10px; margin-top:10px; }
+.btn {
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
+  font-family:inherit;
+  transition:0.2s;
+}
+.btn-primary { background:var(--accent); color:#000; }
+.btn-outline { background:transparent; border:1px solid #555; color:#ccc; }
+.btn-danger { background:rgba(255,61,0,0.1); border:1px solid var(--danger); color:var(--danger); }
+.btn:hover { opacity:0.9; }
+
+.result-box {
+  margin-top:25px;
+  background:#181818;
+  border:2px solid var(--accent);
+  padding:20px;
+  border-radius:12px;
+  text-align:center;
+}
+.result-value {
+  font-size:3rem;
+  color:var(--accent);
+  font-weight:bold;
+  margin:10px 0;
+}
+.result-sub { color:#ccc; font-size:1rem; }
+.result-detail { margin-top:15px; font-size:0.85rem; color:#888; border-top:1px solid #333; padding-top:10px; }
+.result-detail div { margin-bottom:5px; }
+
+.modal-overlay {
+  position:fixed; top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.85);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+.modal {
+  background:var(--card);
+  padding:30px;
+  border-radius:12px;
+  width:90%;
+  max-width:400px;
+  border:1px solid var(--accent);
+  text-align:center;
+}
+.modal h3 { color:var(--accent); margin-top:0; }
+</style>
+</head>
+<body>
+
+<div class="container">
+<div class="card">
+  <h1>ماشین حساب حجم پیشرفته</h1>
+  
+  <h2>⚙️ پارامترهای معاملاتی</h2>
+  <div class="input-group">
+    <label>ارزش هر واحد پایه (تومان)</label>
+    <input type="number" id="baseUnitValue" value="2300000" oninput="calculate()">
+    <small style="color:#666">مثلا: 2,300,000 تومان</small>
+  </div>
+
+  <div class="input-group">
+    <label>مقدار استاپ لاس هر واحد (تومان)</label>
+    <input type="number" id="stopLossPerUnit" placeholder="مثلا: 736000" oninput="calculate()">
+  </div>
+
+  <div class="input-group">
+    <label>تحمل استاپ پشت سر هم (تعداد)</label>
+    <select id="maxStops" onchange="calculate()">
+      <option value="1">۱ استاپ (ریسک‌گریز)</option>
+      <option value="2">۲ استاپ (متعادل)</option>
+      <option value="3" selected>۳ استاپ (حرفه‌ای)</option>
+      <option value="4">۴ استاپ</option>
+      <option value="5">۵ استاپ</option>
+      <option value="6">۶ استاپ</option>
+      <option value="7">۷ استاپ</option>
+      <option value="8">۸ استاپ</option>
+      <option value="9">۹ استاپ</option>
+      <option value="10">۱۰ استاپ (ریسک‌پذیر)</option>
+    </select>
+  </div>
+
+  <h2>💰 مدیریت سرمایه</h2>
+  <div class="input-group">
+    <label>کل سرمایه فعلی (تومان)</label>
+    <input type="number" id="capital" oninput="calculate()">
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="saveCapitalManual()">💾 ذخیره دستی</button>
+      <button class="btn btn-primary" onclick="syncWithJournal()">🔄 همگام‌سازی با ژورنال</button>
+    </div>
+  </div>
+
+  <h2>📂 پشتیبان‌گیری</h2>
+  <div class="btn-row">
+    <button class="btn btn-outline" onclick="downloadSettings()">⬇ دانلود تنظیمات</button>
+    <button class="btn btn-danger" onclick="document.getElementById('fileInput').click()">⬆ آپلود تنظیمات</button>
+    <input type="file" id="fileInput" style="display:none" accept=".json" onchange="uploadSettings(this)">
+  </div>
+
+  <div class="result-box">
+    <div>تعداد واحد پیشنهادی برای ورود</div>
+    <div class="result-value" id="resultUnits">-</div>
+    <div class="result-sub" id="resultTotalValue">ارزش کل پوزیشن: 0 تومان</div>
+    
+    <div id="statusBadge" class="status-badge" style="display:none; margin-top:10px; padding:5px 10px; border-radius:4px; font-weight:bold;"></div>
+
+    <div class="result-detail">
+      <div>🛡️ نیاز به نقدینگی (۳ استاپ + خرید مجدد): <span id="requiredMargin" style="color:var(--danger)">0</span> تومان</div>
+      <div>📉 ضرر هر معامله: <span id="riskPerTrade">0</span> تومان</div>
+      <div>💰 موجودی پس از ۳ استاپ: <span id="capitalAfterStops">0</span> تومان</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal-overlay" id="setupModal">
+  <div class="modal">
+    <h3>👋 خوش آمدید</h3>
+    <p>لطفاً کل سرمایه اولیه خود را وارد کنید.</p>
+    <input type="number" id="initialCapitalInput" placeholder="مثلا: 10000000" style="margin-bottom:15px;">
+    <button class="btn btn-primary" style="width:100%" onclick="saveInitialCapital()">شروع</button>
+  </div>
+</div>
+
+<script>
+const els = {
+  baseUnitValue: document.getElementById('baseUnitValue'),
+  stopLossPerUnit: document.getElementById('stopLossPerUnit'),
+  maxStops: document.getElementById('maxStops'),
+  capital: document.getElementById('capital'),
+  resultUnits: document.getElementById('resultUnits'),
+  resultTotalValue: document.getElementById('resultTotalValue'),
+  requiredMargin: document.getElementById('requiredMargin'),
+  riskPerTrade: document.getElementById('riskPerTrade'),
+  capitalAfterStops: document.getElementById('capitalAfterStops'),
+  statusBadge: document.getElementById('statusBadge'),
+  setupModal: document.getElementById('setupModal'),
+  initialCapitalInput: document.getElementById('initialCapitalInput')
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadSettings();
+  const savedBase = localStorage.getItem('dynBaseCapital');
+  if (!savedBase) {
+    els.setupModal.style.display = 'flex';
+  } else {
+    els.capital.value = savedBase;
+    calculate();
+  }
+});
+
+function parseMoney(v) {
+  return parseFloat(String(v || 0).replace(/,/g, '')) || 0;
+}
+
+function saveSettings() {
+  localStorage.setItem('dynBaseUnitValue', els.baseUnitValue.value);
+  localStorage.setItem('dynStopLossPerUnit', els.stopLossPerUnit.value);
+  localStorage.setItem('dynMaxStops', els.maxStops.value);
+  localStorage.setItem('dynBaseCapital', els.capital.value);
+}
+
+function loadSettings() {
+  const v1 = localStorage.getItem('dynBaseUnitValue');
+  if(v1) els.baseUnitValue.value = v1;
+  const v2 = localStorage.getItem('dynStopLossPerUnit');
+  if(v2) els.stopLossPerUnit.value = v2;
+  const v3 = localStorage.getItem('dynMaxStops');
+  if(v3) els.maxStops.value = v3;
+}
+
+function calculate() {
+  saveSettings();
+
+  const capital = parseMoney(els.capital.value);
+  const baseUnitVal = parseMoney(els.baseUnitValue.value);
+  const stopLoss = parseMoney(els.stopLossPerUnit.value);
+  const maxStops = parseInt(els.maxStops.value);
+
+  if (capital <= 0 || baseUnitVal <= 0 || stopLoss <= 0) {
+    resetDisplay();
+    return;
+  }
+
+  // 1. محاسبه تعداد واحد اولیه بر اساس ارزش پایه
+  let units = Math.floor(capital / baseUnitVal);
+  if (units === 0 && capital >= stopLoss) units = 1; 
+
+  // 2. محاسبه دقیق نیاز به نقدینگی (فرمول اصلاح شده)
+  // نیاز کل = (هزینه خرید مجدد) + (هزینه ضرر استاپ‌ها)
+  // هزینه خرید مجدد = units * baseUnitVal
+  // هزینه ضرر استاپ‌ها = units * stopLoss * maxStops
+  let costToRebuy = units * baseUnitVal;
+  let costOfStops = units * stopLoss * maxStops;
+  let totalRequired = costToRebuy + costOfStops;
+
+  // 3. بررسی امنیت و کاهش حجم در صورت لزوم
+  let isSafe = true;
+  
+  if (totalRequired > capital) {
+    isSafe = false;
+    // حلقه برای پیدا کردن حداکثر حجمی که در آن سرمایه کافی است
+    while (units > 0) {
+      costToRebuy = units * baseUnitVal;
+      costOfStops = units * stopLoss * maxStops;
+      totalRequired = costToRebuy + costOfStops;
+      
+      if (totalRequired <= capital) {
+        break; // حجم امن پیدا شد
+      }
+      units--; // کاهش حجم
+    }
+    
+    // به‌روزرسانی مقادیر نهایی پس از کاهش حجم
+    costToRebuy = units * baseUnitVal;
+    costOfStops = units * stopLoss * maxStops;
+    totalRequired = costToRebuy + costOfStops;
+  }
+
+  const riskPerTrade = units * stopLoss;
+  const remainingCapital = capital - costOfStops;
+
+  // نمایش نتایج
+  els.resultUnits.innerText = units;
+  els.resultTotalValue.innerText = `ارزش کل پوزیشن: ${(units * baseUnitVal).toLocaleString()} تومان`;
+  els.requiredMargin.innerText = totalRequired.toLocaleString();
+  els.riskPerTrade.innerText = riskPerTrade.toLocaleString();
+  els.capitalAfterStops.innerText = remainingCapital.toLocaleString();
+
+  els.statusBadge.style.display = 'inline-block';
+  if (isSafe) {
+    els.statusBadge.style.background = 'rgba(0, 200, 83, 0.15)';
+    els.statusBadge.style.color = 'var(--success)';
+    els.statusBadge.innerText = `✅ امن برای ${maxStops} استاپ`;
+    els.resultUnits.style.color = 'var(--accent)';
+  } else {
+    els.statusBadge.style.background = 'rgba(255, 61, 0, 0.15)';
+    els.statusBadge.style.color = 'var(--danger)';
+    els.statusBadge.innerText = `⚠️ حجم کاهش یافت (کمبود مارجین)`;
+    els.resultUnits.style.color = 'var(--danger)';
+  }
+}
+
+function resetDisplay() {
+  els.resultUnits.innerText = '-';
+  els.resultTotalValue.innerText = '0';
+  els.requiredMargin.innerText = '0';
+  els.riskPerTrade.innerText = '0';
+  els.capitalAfterStops.innerText = '0';
+  els.statusBadge.style.display = 'none';
+}
+
+function saveInitialCapital() {
+  const val = parseMoney(els.initialCapitalInput.value);
+  if (val <= 0) { alert('لطفاً یک عدد معتبر وارد کنید.'); return; }
+  els.capital.value = val;
+  localStorage.setItem('dynBaseCapital', val);
+  els.setupModal.style.display = 'none';
+  calculate();
+}
+
+function syncWithJournal() {
+  const raw = localStorage.getItem('goldTrades');
+  if (!raw) { alert('داده‌ای در ژورنال یافت نشد.'); return; }
+  try {
+    const trades = JSON.parse(raw);
+    let pnl = 0;
+    trades.forEach(t => pnl += parseMoney(t.profit));
+    const base = parseMoney(localStorage.getItem('dynBaseCapital')) || 0;
+    const newCapital = base + pnl;
+    els.capital.value = newCapital;
+    saveSettings();
+    calculate();
+    alert(`✅ همگام‌سازی انجام شد.\nسرمایه اولیه: ${base.toLocaleString()}\nسود/ضرر خالص: ${pnl.toLocaleString()}\nسرمایه فعلی: ${newCapital.toLocaleString()}`);
+  } catch (e) { alert('خطا در خواندن اطلاعات ژورنال.'); }
+}
+
+function saveCapitalManual() {
+  saveSettings();
+  alert('✅ سرمایه فعلی ذخیره شد.');
+}
+
+function downloadSettings() {
+  const data = {
+    baseUnitValue: els.baseUnitValue.value,
+    stopLossPerUnit: els.stopLossPerUnit.value,
+    maxStops: els.maxStops.value,
+    baseCapital: els.capital.value
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type : 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'volume-settings.json';
+  a.click();
+}
+
+function uploadSettings(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if(data.baseUnitValue) els.baseUnitValue.value = data.baseUnitValue;
+      if(data.stopLossPerUnit) els.stopLossPerUnit.value = data.stopLossPerUnit;
+      if(data.maxStops) els.maxStops.value = data.maxStops;
+      if(data.baseCapital) els.capital.value = data.baseCapital;
+      saveSettings();
+      calculate();
+      alert('✅ تنظیمات با موفقیت بارگذاری شد.');
+    } catch (err) { alert('فایل نامعتبر است.'); }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+</script>
+
+</body>
+</html>

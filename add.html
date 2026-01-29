@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ژورنال معاملات طلا - لوکال</title>
+    <style>
+        @font-face {
+            font-family: 'Estedad';
+            src: url('fonts/Estedad-Black.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --input-bg: #2c2c2c;
+            --text-main: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --accent: #d4af37;
+            --accent-hover: #b5952f;
+            --success: #00c853;
+            --danger: #ff3d00;
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+        * {
+            box-sizing: border-box;
+            outline: none;
+        }
+        .inputFont {
+            font-family: "Estedad";
+        }
+        body {
+            font-family: 'Estedad', 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 80%;
+            display: grid; 
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: 350px 1fr;
+            }
+        }
+        .card {
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid #333;
+        }
+        h2, h3 {
+            margin-top: 0;
+            color: var(--accent);
+            font-weight: 600;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--input-bg);
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            transition: var(--transition);
+            font-family: 'Estedad', sans-serif;
+        }
+        input:focus, select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.2);
+        }
+        /* استایل دکمه‌های بالا/پایین */
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .input-wrapper input {
+            padding-left: 40px;
+        }
+        .spin-buttons {
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .spin-btn {
+            width: 24px;
+            height: 14px;
+            background: #444;
+            border: none;
+            color: white;
+            font-size: 10px;
+            cursor: pointer;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .spin-btn:hover {
+            background: var(--accent);
+            color: black;
+        }
+        /* دکمه سود/ضرر */
+        .toggle-container {
+            display: flex;
+            background-color: var(--input-bg);
+            border-radius: 8px;
+            padding: 4px;
+            position: relative;
+            cursor: pointer;
+            border: 1px solid #444;
+        }
+        .toggle-btn {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            z-index: 2;
+            font-weight: bold;
+            transition: color 0.3s;
+            user-select: none;
+        }
+        .toggle-bg {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: calc(50% - 4px);
+            height: calc(100% - 8px);
+            background-color: var(--success);
+            border-radius: 6px;
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            z-index: 1;
+        }
+        .toggle-container.loss .toggle-bg {
+            background-color: var(--danger);
+            transform: translateX(-100%);
+        }
+        .toggle-container.loss .text-loss { color: white; }
+        .toggle-container:not(.loss) .text-profit { color: white; }
+        .toggle-container:not(.loss) .text-loss { color: var(--text-muted); }
+        .toggle-container.loss .text-profit { color: var(--text-muted); }
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--accent);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+        }
+        .btn-submit:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+        .file-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn-outline {
+            flex: 1;
+            padding: 10px;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+        .btn-outline:hover {
+            background: rgba(212, 175, 55, 0.1);
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th {
+            text-align: right;
+            padding: 12px;
+            color: var(--text-muted);
+            border-bottom: 1px solid #333;
+            font-size: 0.9rem;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #333;
+            font-size: 0.95rem;
+        }
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .badge-long { background: rgba(0, 200, 83, 0.2); color: #00c853; }
+        .badge-short { background: rgba(255, 61, 0, 0.2); color: #ff3d00; }
+        .profit-text { color: var(--success); }
+        .loss-text { color: var(--danger); }
+        .btn-delete {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: color 0.2s;
+        }
+        .btn-delete:hover { color: var(--danger); }
+        #fileInput { display: none; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        .calc-preview {
+            font-size: 0.85rem;
+            color: var(--accent);
+            margin-top: 5px;
+            text-align: left;
+            direction: ltr;
+        }
+
+        /* --- استایل‌های جدید برای آپلود عکس --- */
+        .image-upload-wrapper {
+            border: 2px dashed #444;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            background-color: rgba(255,255,255,0.02);
+        }
+        .image-upload-wrapper:hover {
+            border-color: var(--accent);
+            background-color: rgba(212, 175, 55, 0.05);
+        }
+        .image-preview-container {
+            margin-top: 10px;
+            display: none; /* پیش‌فرض مخفی */
+            position: relative;
+        }
+        .image-preview-container img {
+            max-width: 100%;
+            max-height: 150px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            cursor: zoom-in;
+            display: block;
+            margin: 0 auto;
+        }
+        .remove-image-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        .table-thumb {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+            cursor: zoom-in;
+            border: 1px solid #444;
+            transition: transform 0.2s;
+        }
+        .table-thumb:hover {
+            transform: scale(1.1);
+            border-color: var(--accent);
+        }
+
+        /* --- استایل‌های کول‌آپ (Lightbox) --- */
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .lightbox-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 85vh;
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            animation: zoom 0.3s ease;
+        }
+        .close-lightbox {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+            z-index: 1001;
+        }
+        .close-lightbox:hover {
+            color: var(--danger);
+        }
+        @keyframes zoom {
+            from {transform:scale(0)} 
+            to {transform:scale(1)}
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- بخش فرم -->
+    <div class="card">
+        <h2>افزودن معامله</h2>
+        <form id="tradeForm">
+            <div class="form-group">
+                <label>نماد</label>
+                <input type="text" id="symbol" class="inputFont" value="طلای آبشده" required>
+            </div>
+            <!-- فیلد ۱: حجم سرمایه (برای محاسبه تعداد واحد) -->
+            <div class="form-group">
+                <label>حجم سرمایه (تومان)</label>
+                <div class="input-wrapper">
+                    <input type="text" id="capitalAmount" class="inputFont number-input" placeholder="مثلا: 4,600,000" required>
+                    <div class="spin-buttons">
+                        <button type="button" class="spin-btn" onclick="adjustCapital(2300000)">▲</button>
+                        <button type="button" class="spin-btn" onclick="adjustCapital(-2300000)">▼</button>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>تعداد واحد</label>
+                <input type="number" id="quantity" class="inputFont number-input" step="0.01" placeholder="محاسبه خودکار یا دستی" required>
+            </div>
+            <!-- فیلد ۲: نقطه ورود (قیمت) - جدید -->
+            <div class="form-group">
+                <label>نقطه ورود (قیمت)</label>
+                <input type="text" id="entryPrice" class="inputFont number-input" placeholder="مثلا: 3,500,000" oninput="calculateProfit()">
+            </div>
+            <div class="form-group">
+                <label>نوع معامله</label>
+                <select id="tradeType" class="inputFont" onchange="calculateProfit()">
+                    <option value="Long" class="inputFont">لانگ (خرید)</option>
+                    <option value="Short" class="inputFont">شورت (فروش)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>وضعیت معامله</label>
+                <div class="toggle-container" id="statusToggle" onclick="toggleStatus()">
+                    <div class="toggle-bg"></div>
+                    <div class="toggle-btn text-profit">سود</div>
+                    <div class="toggle-btn text-loss">ضرر</div>
+                </div>
+                <input type="hidden" id="statusValue" value="profit">
+            </div>
+            <div class="form-group">
+                <label>نقطه خروج (قیمت)</label>
+                <input type="text" id="exitPrice" class="inputFont number-input" placeholder="مثلا: 3,546,000" oninput="calculateProfit()">
+            </div>
+            <div class="form-group">
+                <label>تعداد خط تغییر قیمت</label>
+                <input type="text" id="linesChanged" class="inputFont number-input" placeholder="محاسبه می‌شود..." readonly style="background-color: #252525; color: #888;">
+                <div id="linesPreview" class="calc-preview"></div>
+            </div>
+            <div class="form-group">
+                <label>مقدار سود/ضرر (تومان) - محاسبه خودکار</label>
+                <input type="text" id="profitAmount" class="inputFont number-input" placeholder="محاسبه می‌شود..." readonly style="background-color: #252525; color: var(--accent); font-weight: bold;">
+            </div>
+            
+            <!-- بخش جدید: آپلود عکس -->
+            <div class="form-group">
+                <label>تصویر تحلیل (اختیاری)</label>
+                <input type="file" id="tradeImageInput" accept="image/*" style="display: none;" onchange="handleImageUpload(this)">
+                <div class="image-upload-wrapper" onclick="document.getElementById('tradeImageInput').click()">
+                    <span style="color: var(--text-muted); font-size: 0.9rem;">برای انتخاب تصویر کلیک کنید</span>
+                </div>
+                <div class="image-preview-container" id="imagePreviewContainer">
+                    <button type="button" class="remove-image-btn" onclick="removeImage(event)">×</button>
+                    <img id="imagePreview" src="" alt="پیش‌نمایش" onclick="openLightbox(this.src)">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>تاریخ (شمسی)</label>
+                <input type="text" id="dateInput" readonly class="inputFont" style="cursor: default; background-color: #252525; color: #888;">
+            </div>
+            <button type="submit" class="btn-submit">ثبت معامله</button>
+        </form>
+        <div class="file-controls">
+            <button class="btn-outline" onclick="downloadData()">💾 ذخیره فایل</button>
+            <button class="btn-outline" onclick="document.getElementById('fileInput').click()">📂 بازیابی</button>
+            <input type="file" id="fileInput" accept=".json" onchange="uploadData(this)">
+        </div>
+    </div>
+    <!-- بخش لیست -->
+    <div class="card">
+        <h3>لیست معاملات</h3>
+        <div class="table-responsive">
+            <table id="tradeTable">
+                <thead>
+                <tr>
+                    <th>تصویر</th>
+                    <th>تاریخ</th>
+                    <th>نماد</th>
+                    <th>نوع</th>
+                    <th>ورود (قیمت)</th>
+                    <th>خروج (قیمت)</th>
+                    <th>تعداد</th>
+                    <th>وضعیت</th>
+                    <th>مبلغ</th>
+                    <th>عملیات</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- ردیف‌ها اینجا اضافه می‌شوند -->
+                </tbody>
+            </table>
+        </div>
+        <div id="emptyState" style="text-align: center; color: #555; margin-top: 20px; display: none;">
+            معامله‌ای ثبت نشده است.
+        </div>
+    </div>
+</div>
+
+<!-- المان کول‌آپ -->
+<div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
+    <span class="close-lightbox" onclick="closeLightbox(event)">&times;</span>
+    <img class="lightbox-content" id="lightboxImg">
+</div>
+
+<script>
+    // --- تنظیمات ---
+    const UNIT_VALUE = 2300000; // ارزش هر واحد (۲,۳۰۰,۰۰۰ تومان)
+    const LINE_VALUE = 23000;   // ارزش هر خط (۲۳,۰۰۰ تومان)
+    
+    // متغیر برای نگهداری موقت عکس Base64
+    let currentImageBase64 = null;
+
+    // --- 1. تبدیل تاریخ میلادی به شمسی ---
+    function gregorianToJalali(gy, gm, gd) {
+        const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+        let jy = (gy <= 1600) ? 0 : 979;
+        gy -= (gy <= 1600) ? 621 : 1600;
+        const gy2 = (gm > 2) ? (gy + 1) : gy;
+        let days = (365 * gy) + parseInt((gy2 + 3) / 4) - parseInt((gy2 + 99) / 100) + parseInt((gy2 + 399) / 400) - 80 + gd + g_d_m[gm - 1];
+        jy += 33 * parseInt(days / 12053);
+        days %= 12053;
+        jy += 4 * parseInt(days / 1461);
+        days %= 1461;
+        jy += parseInt((days - 1) / 365);
+        if (days > 365) days = (days - 1) % 365;
+        const jm = (days < 186) ? 1 + parseInt(days / 31) : 7 + parseInt((days - 186) / 30);
+        const jd = 1 + ((days < 186) ? (days % 31) : ((days - 186) % 30));
+        return [jy, jm, jd];
+    }
+    function getTodayJalali() {
+        const today = new Date();
+        const jalali = gregorianToJalali(today.getFullYear(), today.getMonth() + 1, today.getDate());
+        return `${jalali[0]}/${String(jalali[1]).padStart(2, '0')}/${String(jalali[2]).padStart(2, '0')}`;
+    }
+    // --- 2. مدیریت وضعیت برنامه ---
+    let trades = [];
+    let isLoss = false;
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('dateInput').value = getTodayJalali();
+        const savedData = localStorage.getItem('goldTrades');
+        if (savedData) {
+            trades = JSON.parse(savedData);
+            renderTable();
+        }
+        setupNumberInputs();
+    });
+    // --- 3. مدیریت اینپوت‌های عددی ---
+    function setupNumberInputs() {
+        const inputs = document.querySelectorAll('.number-input');
+        inputs.forEach(input => {
+            input.addEventListener('input', (e) => {
+                let value = e.target.value.replace(/[^0-9]/g, '');
+                if (value) {
+                    e.target.value = Number(value).toLocaleString();
+                } else {
+                    e.target.value = '';
+                }
+                // لاجیک تغییر خودکار تعداد واحد هنگام تغییر حجم سرمایه
+                if (e.target.id === 'capitalAmount') {
+                    autoCalculateQuantity(value);
+                }
+                // محاسبه سود اگر قیمت‌ها تغییر کرد
+                if (e.target.id === 'entryPrice' || e.target.id === 'exitPrice' || e.target.id === 'quantity') {
+                    calculateProfit();
+                }
+            });
+            input.addEventListener('focus', (e) => {
+                e.target.value = e.target.value.replace(/,/g, '');
+            });
+            input.addEventListener('blur', (e) => {
+                let value = e.target.value.replace(/[^0-9]/g, '');
+                if (value) {
+                    e.target.value = Number(value).toLocaleString();
+                } else {
+                    e.target.value = '';
+                }
+            });
+        });
+    }
+    // --- 4. محاسبه خودکار تعداد واحد ---
+    function autoCalculateQuantity(capitalValue) {
+        const quantityInput = document.getElementById('quantity');
+        const capital = parseInt(capitalValue);
+        if (capital > 0) {
+            const units = capital / UNIT_VALUE;
+            quantityInput.value = units;
+        } else {
+            quantityInput.value = '';
+        }
+    }
+    // --- 5. منطق دکمه سود/ضرر ---
+    function toggleStatus() {
+        isLoss = !isLoss;
+        const container = document.getElementById('statusToggle');
+        const hiddenInput = document.getElementById('statusValue');
+        if (isLoss) {
+            container.classList.add('loss');
+            hiddenInput.value = 'loss';
+        } else {
+            container.classList.remove('loss');
+            hiddenInput.value = 'profit';
+        }
+        calculateProfit();
+    }
+    // --- 6. تنظیم حجم سرمایه داینامیک ---
+    function adjustCapital(amount) {
+        const input = document.getElementById('capitalAmount');
+        let currentVal = parseInt(input.value.replace(/,/g, '')) || 0;
+        let newVal = currentVal + amount;
+        if (newVal < 0) newVal = 0;
+        input.value = newVal.toLocaleString();
+        autoCalculateQuantity(newVal);
+    }
+    // --- 7. محاسبه سود و ضرر (اصلاح شده و نهایی) ---
+    function calculateProfit() {
+        const entryPrice = parseInt(document.getElementById('entryPrice').value.replace(/,/g, '')) || 0;
+        const exitPrice = parseInt(document.getElementById('exitPrice').value.replace(/,/g, '')) || 0;
+        const quantity = parseFloat(document.getElementById('quantity').value) || 0;
+        const tradeType = document.getElementById('tradeType').value;
+        let lines = 0;
+        let profit = 0;
+        if (entryPrice > 0 && exitPrice > 0 && quantity > 0) {
+            // 1. محاسبه اختلاف قیمت
+            const priceDiff = exitPrice - entryPrice;
+            // 2. محاسبه تعداد خط (فقط جهت نمایش)
+            // lines = priceDiff / LINE_VALUE;
+            lines = priceDiff
+            // 3. محاسبه سود/ضرر واقعی بر اساس نوع معامله
+            // فرمول: (قیمت خروج - قیمت ورود) * تعداد واحد
+            // اگر لانگ باشد: افزایش قیمت = سود
+            // اگر شورت باشد: کاهش قیمت = سود
+            if (tradeType === 'Long' ) {
+                profit =  (quantity * 23000) * priceDiff;
+            } else {
+                // در شورت، اگر قیمت پایین بیاید (priceDiff منفی)، سود می‌شود.
+                // پس فرمول همان است: priceDiff * quantity
+                profit = (quantity * 23000) * priceDiff;
+            }
+            // 4. اعمال وضعیت دستی کاربر (سود یا ضرر)
+            // اگر کاربر گزینه "ضرر" را انتخاب کرده باشد، عدد نهایی باید منفی شود.
+            // اگر "سود" را انتخاب کرده باشد، عدد باید مثبت شود.
+            if (isLoss) {
+                profit = -Math.abs(profit);
+            } else {
+                profit = Math.abs(profit);
+            }
+        }
+        // نمایش تعداد خط
+        const linesInput = document.getElementById('linesChanged');
+        const linesPreview = document.getElementById('linesPreview');
+        if (lines !== 0) {
+            linesInput.value = lines.toFixed(1);
+            linesPreview.textContent = `${lines.toFixed(1)} خط`;
+        } else {
+            linesInput.value = '';
+            linesPreview.textContent = '';
+        }
+        // نمایش مبلغ سود/ضرر
+        const profitInput = document.getElementById('profitAmount');
+        if (profit !== 0) {
+            profitInput.value = profit.toLocaleString();
+            profitInput.style.color = profit >= 0 ? 'var(--success)' : 'var(--danger)';
+        } else {
+            profitInput.value = '';
+            profitInput.style.color = 'var(--accent)';
+        }
+    }
+
+    // --- جدید: مدیریت آپلود عکس ---
+    function handleImageUpload(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            
+            // محدودیت حجم (مثلا 2 مگابایت) برای جلوگیری از پر شدن LocalStorage
+            if (input.files[0].size > 2 * 1024 * 1024) {
+                alert('حجم تصویر نباید بیشتر از ۲ مگابایت باشد.');
+                input.value = ''; // پاک کردن اینپوت
+                return;
+            }
+
+            reader.onload = function(e) {
+                currentImageBase64 = e.target.result;
+                const previewContainer = document.getElementById('imagePreviewContainer');
+                const previewImg = document.getElementById('imagePreview');
+                
+                previewImg.src = currentImageBase64;
+                previewContainer.style.display = 'block';
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function removeImage(event) {
+        event.stopPropagation(); // جلوگیری از باز شدن پنجره انتخاب فایل
+        document.getElementById('tradeImageInput').value = '';
+        currentImageBase64 = null;
+        document.getElementById('imagePreviewContainer').style.display = 'none';
+    }
+
+    // --- 8. ثبت معامله ---
+    document.getElementById('tradeForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const newTrade = {
+            id: Date.now(),
+            date: document.getElementById('dateInput').value,
+            symbol: document.getElementById('symbol').value,
+            capital: document.getElementById('capitalAmount').value,
+            quantity: document.getElementById('quantity').value,
+            entry: document.getElementById('entryPrice').value,
+            exit: document.getElementById('exitPrice').value,
+            type: document.getElementById('tradeType').value,
+            status: document.getElementById('statusValue').value,
+            profit: document.getElementById('profitAmount').value,
+            lines: document.getElementById('linesChanged').value,
+            image: currentImageBase64 // ذخیره عکس
+        };
+        trades.push(newTrade);
+        
+        try {
+            localStorage.setItem('goldTrades', JSON.stringify(trades));
+            renderTable();
+            // ریست کردن فرم (به جز تاریخ)
+            this.reset();
+            document.getElementById('dateInput').value = getTodayJalali();
+            document.getElementById('statusValue').value = 'profit';
+            document.getElementById('statusToggle').classList.remove('loss');
+            isLoss = false;
+            document.getElementById('profitAmount').style.color = 'var(--accent)';
+            
+            // ریست کردن بخش عکس
+            removeImage({ stopPropagation: () => {} }); 
+        } catch (err) {
+            alert('فضای حافظه مرورگر پر شده است. لطفاً تصاویر با حجم کمتر آپلود کنید یا معاملات قدیمی را حذف کنید.');
+            // حذف آخرین آیتم اضافه شده چون ذخیره نشد
+            trades.pop();
+        }
+    });
+    // --- 9. رندر کردن جدول ---
+    function renderTable() {
+        const tbody = document.querySelector('#tradeTable tbody');
+        const emptyState = document.getElementById('emptyState');
+        tbody.innerHTML = '';
+        if (trades.length === 0) {
+            emptyState.style.display = 'block';
+            return;
+        }
+        emptyState.style.display = 'none';
+        // مرتب‌سازی بر اساس تاریخ (جدیدترین بالا)
+        const sortedTrades = [...trades].sort((a, b) => b.id - a.id);
+
+        sortedTrades.forEach(trade => {
+            const tr = document.createElement('tr');
+            const typeClass = trade.type === 'Long' ? 'badge-long' : 'badge-short';
+            const statusClass = trade.status === 'profit' ? 'profit-text' : 'loss-text';
+            const statusText = trade.status === 'profit' ? 'سود' : 'ضرر';
+            
+            // سلول تصویر
+            let imageCell = '<td>-</td>';
+            if (trade.image) {
+                imageCell = `<td><img src="${trade.image}" class="table-thumb" onclick="openLightbox('${trade.image}')" alt="تصویر"></td>`;
+            }
+
+            tr.innerHTML = `
+                ${imageCell}
+                <td>${trade.date}</td>
+                <td>${trade.symbol}</td>
+                <td><span class="badge ${typeClass}">${trade.type}</span></td>
+                <td>${trade.entry}</td>
+                <td>${trade.exit}</td>
+                <td>${trade.quantity}</td>
+                <td class="${statusClass}">${statusText}</td>
+                <td class="${statusClass}">${trade.profit}</td>
+                <td>
+                    <button class="btn-delete" onclick="deleteTrade(${trade.id})">×</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+    // --- 10. حذف معامله ---
+    window.deleteTrade = function(id) {
+        if(confirm('آیا از حذف این معامله مطمئن هستید؟')) {
+            trades = trades.filter(t => t.id !== id);
+            localStorage.setItem('goldTrades', JSON.stringify(trades));
+            renderTable();
+        }
+    };
+    // --- 11. دانلود و آپلود ---
+    window.downloadData = function() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(trades));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "gold_trades.json");
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    };
+    window.uploadData = function(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                trades = JSON.parse(e.target.result);
+                localStorage.setItem('goldTrades', JSON.stringify(trades));
+                renderTable();
+                alert('اطلاعات با موفقیت بازیابی شد.');
+            } catch (err) {
+                alert('خطا در خواندن فایل.');
+            }
+        };
+        reader.readAsText(file);
+    };
+
+    // --- جدید: توابع کول‌آپ (Lightbox) ---
+    function openLightbox(src) {
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightboxImg');
+        lightbox.style.display = 'flex';
+        lightboxImg.src = src;
+    }
+
+    function closeLightbox(event) {
+        // بستن فقط اگر روی دکمه ضربدر یا پس‌زمینه کلیک شد (نه روی خود عکس)
+        if (event.target.id === 'lightbox' || event.target.classList.contains('close-lightbox')) {
+            document.getElementById('lightbox').style.display = 'none';
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+@font-face {
+	font-family: 'Estedad';
+		src: url('../fonts/Estedad-Black.woff2') format('woff2'),
+		url('../fonts/Estedad-Bold.woff2') format('woff2');
+		font-weight: normal;
+		font-style: normal;
+	}
+	body: {
+		font-family: 'Estedad'
+	}
