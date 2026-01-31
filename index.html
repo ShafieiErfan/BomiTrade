@@ -34,7 +34,6 @@
             line-height: 1.6;
             overflow-x: hidden;
         }
-
         /* --- هدر و ناوبری --- */
         header {
             position: fixed;
@@ -242,6 +241,64 @@
             font-size: 0.95rem;
         }
 
+        /* --- بخش تیکر زنده بازار (جدولی) --- */
+        #market-ticker {
+            padding: 80px 20px;
+            background: #0a0a0a;
+            position: relative;
+            overflow: hidden;
+        }
+        #market-ticker::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        /* استایل جدول تیکر */
+        .ticker-table-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .ticker-table-responsive {
+            overflow-x: auto;
+        }
+        .ticker-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+        .ticker-table th {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--accent);
+            padding: 15px;
+            text-align: right;
+            font-weight: bold;
+            border-bottom: 2px solid var(--border-color);
+        }
+        .ticker-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+            transition: background 0.2s;
+        }
+        .ticker-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .ticker-table tr:last-child td {
+            border-bottom: none;
+        }
+        .ticker-icon-cell { font-size: 1.5rem; text-align: center; width: 60px; }
+        .ticker-price-cell { font-family: 'Estedad', sans-serif; font-weight: bold; font-size: 1.1rem; }
+        .ticker-change-up { color: var(--success); }
+        .ticker-change-down { color: var(--danger); }
+
         /* --- فوتر --- */
         footer {
             background: #000;
@@ -262,11 +319,11 @@
             .hero h1 { font-size: 2.5rem; }
             .nav-container { flex-direction: column; gap: 15px; }
             nav ul { gap: 15px; font-size: 0.9rem; }
+            .ticker-table th, .ticker-table td { padding: 10px; font-size: 0.9rem; }
         }
     </style>
 </head>
 <body>
-
     <!-- هدر -->
     <header id="mainHeader">
         <div class="nav-container">
@@ -278,6 +335,7 @@
                     <li><a href="data.html">معاملات</a></li>
                     <li><a href="scalpCalc.html">ماشین حساب</a></li>
                     <li><a href="vloume.html">مدیریت حجم</a></li>
+                    <li><a href="assetManagement.html">مدیریت دارایی</a></li>
                 </ul>
             </nav>
         </div>
@@ -345,12 +403,45 @@
         </div>
     </section>
 
+    <!-- --- بخش تیکر زنده بازار (جدولی) --- -->
+    <section id="market-ticker">
+        <div class="">
+            <h2 class="section-title">💰 قیمت‌های لحظه‌ای بازار</h2>
+            
+            <div class="ticker-table-container">
+                <div class="ticker-table-responsive">
+                    <table class="ticker-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 60px;">#</th>
+                                <th>نام دارایی</th>
+                                <th>قیمت (واحد)</th>
+                                <th>تغییرات</th>
+                                <th>درصد تغییر</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tickerTableBody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--text-muted);">در حال دریافت قیمت‌ها...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- زمان آخرین بروزرسانی -->
+            <div style="text-align: center; margin-top: 20px; color: var(--text-muted); font-size: 0.9rem;">
+                آخرین بروزرسانی: <span id="lastUpdateTime">--:--</span>
+            </div>
+        </div>
+    </section>
+
     <!-- فوتر -->
     <footer id="about">
         <p>© ۱۴۰۴ بومی‌ترید. تمامی حقوق محفوظ است.</p>
     </footer>
 
-    <!-- بخش اسکریپت نهایی (جایگزین کنید) -->
+    <!-- بخش اسکریپت نهایی -->
     <script>
         // --- 1. مدیریت هدر استیکی ---
         window.addEventListener('scroll', () => {
@@ -362,7 +453,7 @@
             }
         });
 
-        // --- 2. تبدیل تاریخ میلادی به شمسی (برای فهمیدن امروز شمسی) ---
+        // --- 2. تبدیل تاریخ میلادی به شمسی ---
         function toJalali(gy, gm, gd) {
             const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
             let jy = (gy <= 1600) ? 0 : 979;
@@ -381,29 +472,23 @@
         }
 
         // --- 3. مقایسه رشته‌های تاریخ شمسی ---
-        // فرمت ورودی: "1403/10/29"
         function compareJalaliDates(dateStr1, dateStr2) {
             if (!dateStr1 || !dateStr2) return 0;
             const d1 = dateStr1.split('/').map(Number);
             const d2 = dateStr2.split('/').map(Number);
-            
-            // تبدیل به عدد برای مقایسه (مثلا 14031029)
             const num1 = d1[0] * 10000 + d1[1] * 100 + d1[2];
             const num2 = d2[0] * 10000 + d2[1] * 100 + d2[2];
-            
             if (num1 < num2) return -1;
             if (num1 > num2) return 1;
             return 0;
         }
 
-        // --- 4. محاسبه آمار ---
+        // --- 4. محاسبه آمار معاملات ---
         let trades = [];
-
         function parseMoney(str) {
             if (!str) return 0;
             return parseFloat(str.toString().replace(/,/g, '')) || 0;
         }
-
         function calculateStats() {
             const savedData = localStorage.getItem('goldTrades');
             if (savedData) {
@@ -414,41 +499,31 @@
                     trades = [];
                 }
             } else {
-                console.log("داده‌ای یافت نشد.");
                 return;
             }
-
-            // 1. پیدا کردن تاریخ امروز به شمسی
             const now = new Date();
             const jToday = toJalali(now.getFullYear(), now.getMonth() + 1, now.getDate());
             const todayStr = `${jToday.year}/${jToday.month}/${jToday.day}`;
-
-            // 2. محاسبه شروع هفته شمسی (فرض: شنبه اول هفته)
-            // برای سادگی، ۶ روز از امروز کم میکنیم (تقریبی)
-            // برای دقیق بودن نیاز به کتابخانه jalaali-js است، اما اینجا دستی انجام میدهیم
+            
             const weekStartObj = new Date(now);
-            weekStartObj.setDate(now.getDate() - 6); // ۷ روز قبل
+            weekStartObj.setDate(now.getDate() - 6);
             const jWeekStart = toJalali(weekStartObj.getFullYear(), weekStartObj.getMonth() + 1, weekStartObj.getDate());
             const weekStartStr = `${jWeekStart.year}/${jWeekStart.month}/${jWeekStart.day}`;
-
-            // 3. محاسبه شروع ماه شمسی
+            
             const monthStartStr = `${jToday.year}/${jToday.month}/01`;
-
-            // 4. محاسبه ۳ ماه قبل (ساده شده: فقط ماه را کم میکنیم)
+            
             let m3 = jToday.month - 3;
             let y3 = jToday.year;
             if (m3 <= 0) { m3 += 12; y3 -= 1; }
             const month3StartStr = `${y3}/${m3}/01`;
-
-            // 5. محاسبه ۶ ماه قبل
+            
             let m6 = jToday.month - 6;
             let y6 = jToday.year;
             if (m6 <= 0) { m6 += 12; y6 -= 1; }
             const month6StartStr = `${y6}/${m6}/01`;
-
-            // 6. محاسبه ۱ سال قبل
+            
             const year1StartStr = `${jToday.year - 1}/01/01`;
-
+            
             const periods = {
                 'statToday': todayStr,
                 'statWeek': weekStartStr,
@@ -457,20 +532,17 @@
                 'stat6Month': month6StartStr,
                 'stat1Year': year1StartStr
             };
-
+            
             for (const [id, startDateStr] of Object.entries(periods)) {
                 let total = 0;
                 trades.forEach(t => {
-                    // مقایسه رشته‌ای تاریخ شمسی
-                    // اگر تاریخ معامله بزرگتر یا مساوی شروع بازه بود
                     if (compareJalaliDates(t.date, startDateStr) >= 0) {
                         total += parseMoney(t.profit);
                     }
                 });
-
                 const el = document.getElementById(id);
                 if (el) {
-                    el.innerText = total.toLocaleString();
+                    el.innerText = total.toLocaleString('fa-IR');
                     el.className = 'stat-value ' + (total >= 0 ? 'profit' : 'loss');
                 }
             }
@@ -478,11 +550,9 @@
 
         // --- 5. تابع افزودن داده تست ---
         function addTestData() {
-            // دریافت تاریخ امروز شمسی واقعی
             const now = new Date();
             const jToday = toJalali(now.getFullYear(), now.getMonth() + 1, now.getDate());
             const todayStr = `${jToday.year}/${jToday.month}/${jToday.day}`;
-
             const dummyTrade = {
                 id: Date.now(),
                 date: todayStr, 
@@ -494,16 +564,154 @@
                 status: "profit",
                 profit: "5000000" 
             };
-
             const existing = JSON.parse(localStorage.getItem('goldTrades') || "[]");
             existing.push(dummyTrade);
             localStorage.setItem('goldTrades', JSON.stringify(existing));
-            
             alert(`یک معامله تست با تاریخ امروز (${todayStr}) اضافه شد.`);
             calculateStats();
         }
 
-        // اجرای اولیه
+        // --- 6. مدیریت تیکر بازار (جدولی + نقره) ---
+        (function() {
+            const API_KEY = 'Bll5EW1kxdFEDWBseYMHTlUSmL7DdpcT';
+            const API_URL_GOLD = 'https://brsapi.ir/Api/Market/Gold_Currency.php?key=';
+            const API_URL_COMMODITY = 'https://brsapi.ir/Api/Market/Commodity.php?key=';
+            const CACHE_KEY = 'marketTickerCache';
+            const UPDATE_INTERVAL = 10 * 60 * 1000; // ۱۰ دقیقه
+
+            const TARGET_ITEMS = [
+                { id: 'gold_18', symbol: 'IR_GOLD_18K', name: 'طلای ۱۸ عیار', icon: '🥇' },
+                { id: 'gold_24', symbol: 'IR_GOLD_24K', name: 'طلای ۲۴ عیار', icon: '🥈' },
+                { id: 'coin_1g', symbol: 'IR_COIN_1G', name: 'سکه یک گرمی', icon: '🪙' },
+                { id: 'coin_quarter', symbol: 'IR_COIN_QUARTER', name: 'ربع سکه', icon: '🪙' },
+                { id: 'coin_half', symbol: 'IR_COIN_HALF', name: 'نیم سکه', icon: '🪙' },
+                { id: 'coin_emami', symbol: 'IR_COIN_EMAMI', name: 'سکه امامی', icon: '👑' },
+                { id: 'silver', symbol: 'XAGUSD', name: 'نقره (گرم)', icon: '🤍' }, // محاسبه شده
+                { id: 'usd', symbol: 'USD', name: 'دلار آمریکا', icon: '💵' },
+                { id: 'usdt', symbol: 'USDT_IRT', name: 'تتر (تومان)', icon: '💎' },
+                { id: 'btc', symbol: 'BTC', name: 'بیتکوین (دلار)', icon: '₿' }
+            ];
+
+            const tickerTableBody = document.getElementById('tickerTableBody');
+            const lastUpdateTimeEl = document.getElementById('lastUpdateTime');
+
+            function formatPrice(price, isDollar = false) {
+                const num = parseFloat(price);
+                if (isNaN(num)) return '---';
+                return isDollar 
+                    ? num.toLocaleString('en-US', {maximumFractionDigits: 2}) 
+                    : num.toLocaleString('fa-IR');
+            }
+
+            function renderTicker(dataGold, dataCommodity) {
+                tickerTableBody.innerHTML = '';
+                
+                // استخراج قیمت دلار برای محاسبه نقره
+                const usdPrice = dataGold.currency?.find(i => i.symbol === 'USD')?.price || 0;
+
+                TARGET_ITEMS.forEach(item => {
+                    let priceData = null;
+                    let isDollar = false;
+                    let calculatedPrice = null;
+
+                    // جستجو در آرایه‌ها
+                    if (['gold_18', 'gold_24', 'coin_1g', 'coin_quarter', 'coin_half', 'coin_emami'].includes(item.id)) {
+                        priceData = dataGold.gold?.find(i => i.symbol === item.symbol);
+                    } else if (['usd', 'usdt'].includes(item.id)) {
+                        priceData = dataGold.currency?.find(i => i.symbol === item.symbol);
+                    } else if (item.id === 'btc') {
+                        priceData = dataGold.cryptocurrency?.find(i => i.symbol === item.symbol);
+                        isDollar = true;
+                    } else if (item.id === 'silver') {
+                        // محاسبه نقره
+                        const silverOunce = dataCommodity.metal_precious?.find(i => i.symbol === 'XAGUSD');
+                        if (silverOunce && usdPrice) {
+                            const ouncePriceUSD = parseFloat(silverOunce.price);
+                            // فرمول: (قیمت انس دلار / 31.1035) * قیمت دلار تومان
+                            calculatedPrice = (ouncePriceUSD / 31.1035) * usdPrice;
+                            
+                            // ساخت آبجکت فیک برای نمایش یکسان
+                            priceData = {
+                                price: calculatedPrice,
+                                change_value: silverOunce.change_value, // تغییر دلاری
+                                change_percent: silverOunce.change_percent,
+                                unit: 'تومان'
+                            };
+                        }
+                    }
+
+                    if (priceData) {
+                        const changeVal = parseFloat(priceData.change_value);
+                        const changeClass = changeVal >= 0 ? 'ticker-change-up' : 'ticker-change-down';
+                        const changeSign = changeVal >= 0 ? '+' : '';
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td class="ticker-icon-cell">${item.icon}</td>
+                            <td>${item.name}</td>
+                            <td class="ticker-price-cell">${formatPrice(priceData.price, isDollar)} ${priceData.unit === 'تومان' ? 'تومان' : '$'}</td>
+                            <td class="${changeClass}">${changeSign}${changeVal.toLocaleString('fa-IR')}</td>
+                            <td class="${changeClass}">${changeSign}${priceData.change_percent}%</td>
+                        `;
+                        tickerTableBody.appendChild(row);
+                    }
+                });
+            }
+
+            function updateTime() {
+                const now = new Date();
+                lastUpdateTimeEl.textContent = now.toLocaleTimeString('fa-IR');
+            }
+
+            async function fetchMarketData() {
+                const cached = localStorage.getItem(CACHE_KEY);
+                const now = Date.now();
+
+                if (cached) {
+                    const { dataGold, dataCommodity, timestamp } = JSON.parse(cached);
+                    if (now - timestamp < UPDATE_INTERVAL) {
+                        renderTicker(dataGold, dataCommodity);
+                        updateTime();
+                        return;
+                    }
+                }
+
+                try {
+                    // درخواست همزمان
+                    const [res1, res2] = await Promise.all([
+                        fetch(`${API_URL_GOLD}${API_KEY}`),
+                        fetch(`${API_URL_COMMODITY}${API_KEY}`)
+                    ]);
+                    
+                    const dataGold = await res1.json();
+                    const dataCommodity = await res2.json();
+                    
+                    localStorage.setItem(CACHE_KEY, JSON.stringify({ dataGold, dataCommodity, timestamp: now }));
+                    
+                    renderTicker(dataGold, dataCommodity);
+                    updateTime();
+                } catch (error) {
+                    console.error('خطا در دریافت قیمت تیکر:', error);
+                    if (cached) {
+                        const { dataGold, dataCommodity } = JSON.parse(cached);
+                        renderTicker(dataGold, dataCommodity);
+                        // نمایش پیام خطا در جدول
+                        const errorRow = document.createElement('tr');
+                        errorRow.innerHTML = `<td colspan="5" style="text-align:center; color:orange; padding:10px;">اتصال اینترنت برقرار نیست. آخرین قیمت‌های ذخیره شده نمایش داده می‌شوند.</td>`;
+                        tickerTableBody.appendChild(errorRow);
+                    } else {
+                        tickerTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--danger);">خطا در دریافت اطلاعات.</td></tr>';
+                    }
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                fetchMarketData();
+                setInterval(fetchMarketData, UPDATE_INTERVAL);
+            });
+        })();
+
+        // --- اجرای اولیه ---
         document.addEventListener('DOMContentLoaded', () => {
             calculateStats();
             window.addTestData = addTestData;

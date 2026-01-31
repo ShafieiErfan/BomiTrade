@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بومی‌ترید | مدیریت دارایی</title>
+    <style>
+        /* تنظیمات فونت و متغیرها (همانند نمونه) */
+        @font-face {
+            font-family: 'Estedad';
+            src: url('fonts/Estedad-Black.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        :root {
+            --bg-color: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --text-main: #ffffff;
+            --text-muted: #b0b0b0;
+            --accent: #d4af37; /* طلایی */
+            --accent-hover: #f9ce48;
+            --success: #00c853;
+            --danger: #ff3d00;
+            --glass-bg: rgba(20, 20, 20, 0.85);
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+        * { box-sizing: border-box; outline: none; scroll-behavior: smooth; }
+        body {
+            font-family: 'Estedad', Tahoma, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* --- هدر و ناوبری --- */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 20px 0;
+            transition: 0.4s;
+            background: transparent;
+        }
+        header.scrolled {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--accent);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo span { color: white; }
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            margin: 0;
+            padding: 0;
+        }
+        nav a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            position: relative;
+        }
+        nav a:hover { color: var(--accent); }
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            right: 0;
+            background: var(--accent);
+            transition: 0.3s;
+        }
+        nav a:hover::after { width: 100%; }
+
+        /* --- بخش اصلی (Hero) --- */
+        .hero {
+            height: 60vh; /* کمی کوتاه‌تر برای داشتن فضای بیشتر برای محتوا */
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1611974765270-ca12586343bb?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 20px;
+            position: relative;
+        }
+        .hero-content {
+            max-width: 800px;
+            animation: fadeInUp 1s ease-out;
+        }
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+        .btn {
+            padding: 12px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+            display: inline-block;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
+        }
+
+        /* --- استایل سفارشی برای اینپوت تصویر --- */
+.custom-file-upload {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 48px; /* هم‌ارتفاع با اینپوت‌های دیگر */
+    background: #0f0f0f;
+    border: 1px dashed var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    gap: 10px;
+}
+
+.custom-file-upload:hover {
+    border-color: var(--accent);
+    background: rgba(212, 175, 55, 0.05);
+    color: var(--accent);
+}
+
+/* مخفی کردن اینپوت اصلی */
+.custom-file-upload input[type="file"] {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+
+/* آیکون آپلود */
+.upload-icon {
+    font-size: 1.2rem;
+    transition: transform 0.3s;
+}
+
+.custom-file-upload:hover .upload-icon {
+    transform: translateY(-2px);
+}
+        /* --- بخش آمار (PNL) --- */
+        .stats-section {
+            padding: 60px 20px;
+            background: var(--bg-color);
+            position: relative;
+            margin-top: -50px; /* تداخل زیبا با هیرو */
+            z-index: 10;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 40px;
+            color: var(--accent);
+        }
+        .stats-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-color: var(--accent);
+        }
+        .stat-label {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+        .stat-value.profit { color: var(--success); text-shadow: 0 0 10px rgba(0,200,83,0.3); }
+        .stat-value.loss { color: var(--danger); text-shadow: 0 0 10px rgba(255,61,0,0.3); }
+
+        /* --- کانتینر اصلی محتوا --- */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+        }
+
+        /* --- فرم افزودن --- */
+        .form-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            align-items: end;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+        input, select {
+            padding: 12px;
+            background: #0f0f0f;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: white;
+            font-family: inherit;
+            transition: 0.3s;
+        }
+        input:focus, select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+        }
+        .btn-submit {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-submit:hover {
+            background: var(--accent-hover);
+        }
+        .backup-actions {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-outline:hover {
+            background: var(--accent);
+            color: #000;
+        }
+
+        /* --- جدول دارایی‌ها --- */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            min-width: 800px;
+        }
+        th, td {
+            padding: 15px;
+            text-align: right;
+            border-bottom: 1px solid var(--border-color);
+        }
+        th {
+            background: #222;
+            color: var(--accent);
+            font-weight: bold;
+        }
+        tr:hover {
+            background: rgba(255,255,255,0.02);
+        }
+        .asset-img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 8px;
+            background-color: #333;
+        }
+        .btn-delete {
+            background: rgba(255, 61, 0, 0.1);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: 0.3s;
+        }
+        .btn-delete:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* --- فوتر --- */
+        footer {
+            background: #000;
+            padding: 40px 20px;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            margin-top: 60px;
+        }
+        footer p { color: #666; margin: 0; }
+
+        /* --- Toast Notification --- */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            border: 1px solid var(--accent);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 2000;
+            pointer-events: none;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        button {
+            font-family: 'Estedad';
+        }
+        
+        /* --- انیمیشن‌ها --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- واکنش‌گرا --- */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .nav-container { flex-direction: column; gap: 15px; }
+            nav ul { gap: 15px; font-size: 0.9rem; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- هدر -->
+    <header id="mainHeader">
+        <div class="nav-container">
+            <a href="#" class="logo">📈 <span>بومی‌ترید</span></a>
+            <nav>
+                <ul>
+                    <li><a href="#stats">آمار عملکرد</a></li>
+                    <li><a href="add.html">اضافه کردن معامله</a></li>
+                    <li><a href="data.html">معاملات</a></li>
+                    <li><a href="scalpCalc.html">ماشین حساب</a></li>
+                    <li><a href="vloume.html">مدیریت حجم</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- بخش اصلی (Hero) -->
+    <!-- <section class="hero">
+        <div class="hero-content">
+            <h1>مدیریت هوشمند دارایی‌ها</h1>
+            <p>ثبت و پیگیری لحظه‌ای طلا، ارز دیجیتال و نقره با قیمت‌های واقعی بازار</p>
+            <a href="#add-asset" class="btn btn-primary">ثبت دارایی جدید</a>
+        </div>
+    </section> -->
+
+    <!-- بخش آمار (PNL) -->
+    <section id="stats" style="margin: 100px 0;" class="stats-section">
+        <h2 class="section-title">📊 وضعیت کلی پورتفوی</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">ارزش کل فعلی</div>
+                <div class="stat-value" id="totalCurrentValue">۰</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">سرمایه اولیه</div>
+                <div class="stat-value" id="totalInvested">۰</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">سود/زیان خالص</div>
+                <div class="stat-value" id="totalPnl">۰</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">درصد بازدهی</div>
+                <div class="stat-value" id="totalPercent">۰٪</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- کانتینر اصلی -->
+    <div class="main-container">
+        
+        <!-- فرم افزودن دارایی -->
+        <section id="add-asset" class="form-card">
+            <h2 style="color: var(--accent); margin-top: 0;">افزودن دارایی جدید</h2>
+            <form id="assetForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="assetName">نام دارایی</label>
+                        <select id="assetName" required>
+                            <option value="">انتخاب کنید...</option>
+                            <!-- توسط JS پر می‌شود -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="assetAmount">مقدار / حجم</label>
+                        <input type="number" id="assetAmount" step="any" placeholder="مثلا 1.5" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="assetPrice">قیمت خرید (تومان)</label>
+                        <input type="number" id="assetPrice" step="any" placeholder="قیمت واحد خرید" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="assetDate">زمان خرید</label>
+                        <input type="date" id="assetDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="assetImage">تصویر (اختیاری)</label>
+                        <label class="custom-file-upload">
+                            <input type="file" id="assetImage" accept="image/*">
+                            <span class="upload-icon">📷</span>
+                            <span id="fileName">انتخاب تصویر...</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn-submit">افزودن به پورتفوی</button>
+                </div>
+
+                <div class="backup-actions">
+                    <button type="button" id="btnBackup" class="btn-outline">📥 دانلود فایل پشتیبان (JSON)</button>
+                    <button type="button" id="btnUploadTrigger" class="btn-outline">📤 بارگذاری پشتیبان</button>
+                    <input type="file" id="fileUpload" style="display: none;" accept=".json">
+                </div>
+            </form>
+        </section>
+
+        <!-- جدول دارایی‌ها -->
+        <section id="list">
+            <h2 style="color: var(--accent);">لیست دارایی‌های من</h2>
+            <div class="table-responsive">
+                <table id="assetsTable">
+                    <thead>
+                        <tr>
+                            <th>تصویر</th>
+                            <th>نام دارایی</th>
+                            <th>مقدار</th>
+                            <th>میانگین خرید (تومان)</th>
+                            <th>قیمت لحظه‌ای (تومان)</th>
+                            <th>ارزش کل (تومان)</th>
+                            <th>سود/زیان</th>
+                            <th>درصد رشد</th>
+                            <th>عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- توسط JS پر می‌شود -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- فوتر -->
+    <footer>
+        <p>© ۱۴۰۴ بومی‌ترید | مدیریت دارایی‌ها</p>
+    </footer>
+
+    <!-- نوتیفیکیشن -->
+    <div id="toast" class="toast">پیام سیستم</div>
+
+    <script>
+        // --- تنظیمات و متغیرهای سراسری ---
+        const API_KEY = 'Bll5EW1kxdFEDWBseYMHTlUSmL7DdpcT';
+        const API_URL_GOLD_CURRENCY = 'https://brsapi.ir/Api/Market/Gold_Currency.php?key=';
+        const API_URL_COMMODITY = 'https://brsapi.ir/Api/Market/Commodity.php?key=';
+        
+        // لیست دارایی‌های پشتیبانی شده
+        const SUPPORTED_ASSETS = [
+            { id: 'gold_18k', name: 'طلای 18 عیار', type: 'gold', symbol: 'IR_GOLD_18K' },
+            { id: 'tether', name: 'تتر', type: 'currency', symbol: 'USDT_IRT' },
+            { id: 'bitcoin', name: 'بیتکوین', type: 'crypto', symbol: 'BTC' },
+            { id: 'silver', name: 'نقره', type: 'commodity', symbol: 'XAGUSD' }
+        ];
+
+        let assets = [];
+        let marketPrices = {};
+        let lastApiFetchTime = 0;
+        const API_FETCH_INTERVAL = 10 * 60 * 1000; // ۱۰ دقیقه
+
+        // --- المان‌های DOM ---
+        const assetForm = document.getElementById('assetForm');
+        const assetNameSelect = document.getElementById('assetName');
+        const assetsTableBody = document.querySelector('#assetsTable tbody');
+        const toastEl = document.getElementById('toast');
+        const fileUpload = document.getElementById('fileUpload');
+        const header = document.getElementById('mainHeader');
+
+        // --- مقداردهی اولیه ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAssetsFromStorage();
+            populateAssetSelect();
+            renderTable();
+            
+            document.getElementById('assetDate').valueAsDate = new Date();
+            fetchMarketPrices();
+            setInterval(fetchMarketPrices, API_FETCH_INTERVAL);
+
+            // اسکرول هدر
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+        });
+
+        // --- مدیریت داده‌ها ---
+        function loadAssetsFromStorage() {
+            const stored = localStorage.getItem('myAssets');
+            if (stored) assets = JSON.parse(stored);
+        }
+
+        function saveAssetsToStorage() {
+            localStorage.setItem('myAssets', JSON.stringify(assets));
+        }
+
+        // --- منطق API ---
+        async function fetchMarketPrices() {
+            const now = Date.now();
+            if (now - lastApiFetchTime < API_FETCH_INTERVAL && Object.keys(marketPrices).length > 0) return;
+
+            try {
+                const res1 = await fetch(`${API_URL_GOLD_CURRENCY}${API_KEY}`);
+                const data1 = await res1.json();
+                const res2 = await fetch(`${API_URL_COMMODITY}${API_KEY}`);
+                const data2 = await res2.json();
+
+                processApiData(data1, data2);
+                lastApiFetchTime = now;
+                savePricesToCache();
+                renderTable();
+                showToast('قیمت‌ها بروزرسانی شدند');
+            } catch (error) {
+                console.error('API Error:', error);
+                loadPricesFromCache();
+                showToast('خطا در اتصال. آخرین قیمت‌های کش شده نمایش داده می‌شوند.');
+            }
+        }
+
+        function processApiData(data1, data2) {
+            if (data1.gold) {
+                const gold18 = data1.gold.find(i => i.symbol === 'IR_GOLD_18K');
+                if (gold18) marketPrices['gold_18k'] = parseFloat(gold18.price);
+            }
+            if (data1.currency) {
+                const tether = data1.currency.find(i => i.symbol === 'USDT_IRT');
+                const usd = data1.currency.find(i => i.symbol === 'USD');
+                if (tether) marketPrices['tether'] = parseFloat(tether.price);
+                if (usd) marketPrices['USD'] = parseFloat(usd.price);
+            }
+            if (data1.cryptocurrency) {
+                const btc = data1.cryptocurrency.find(i => i.symbol === 'BTC');
+                if (btc) marketPrices['bitcoin'] = parseFloat(btc.price);
+            }
+            // محاسبه نقره
+            if (data2.metal_precious && marketPrices['USD']) {
+                const silverOunce = data2.metal_precious.find(i => i.symbol === 'XAGUSD');
+                if (silverOunce) {
+                    const ouncePriceUSD = parseFloat(silverOunce.price);
+                    const dollarPriceIRT = marketPrices['USD'];
+                    const silverPricePerGramIRT = (ouncePriceUSD / 31.1035) * dollarPriceIRT;
+                    marketPrices['silver'] = silverPricePerGramIRT;
+                }
+            }
+        }
+
+        function savePricesToCache() {
+            localStorage.setItem('marketPricesCache', JSON.stringify({ prices: marketPrices, timestamp: Date.now() }));
+        }
+
+        function loadPricesFromCache() {
+            const cached = localStorage.getItem('marketPricesCache');
+            if (cached) {
+                const data = JSON.parse(cached);
+                marketPrices = data.prices;
+                renderTable();
+            }
+        }
+
+        // --- UI Helpers ---
+        function populateAssetSelect() {
+            SUPPORTED_ASSETS.forEach(asset => {
+                const option = document.createElement('option');
+                option.value = asset.id;
+                option.textContent = asset.name;
+                assetNameSelect.appendChild(option);
+            });
+        }
+
+        function showToast(msg) {
+            toastEl.textContent = msg;
+            toastEl.classList.add('show');
+            setTimeout(() => toastEl.classList.remove('show'), 3000);
+        }
+
+        // --- افزودن دارایی ---
+        assetForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const assetId = document.getElementById('assetName').value;
+            const amount = parseFloat(document.getElementById('assetAmount').value);
+            const buyPrice = parseFloat(document.getElementById('assetPrice').value);
+            const date = document.getElementById('assetDate').value;
+            const imageFile = document.getElementById('assetImage').files[0];
+
+            if (!assetId || isNaN(amount) || isNaN(buyPrice)) return showToast('لطفا فیلدها را کامل کنید');
+
+            let imageData = null;
+            if (imageFile) imageData = await toBase64(imageFile);
+
+            assets.push({ id: Date.now(), assetId, amount, buyPrice, date, image: imageData });
+            saveAssetsToStorage();
+            renderTable();
+            assetForm.reset();
+            document.getElementById('assetDate').valueAsDate = new Date();
+            showToast('دارایی با موفقیت اضافه شد');
+        });
+
+        function toBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        window.deleteAsset = function(id) {
+            if(confirm('آیا از حذف این دارایی اطمینان دارید؟')) {
+                assets = assets.filter(a => a.id !== id);
+                saveAssetsToStorage();
+                renderTable();
+                showToast('دارایی حذف شد');
+            }
+        };
+
+        // --- رندر جدول و PNL ---
+        function renderTable() {
+            assetsTableBody.innerHTML = '';
+            let totalCurrentValue = 0;
+            let totalInvested = 0;
+
+            assets.forEach(asset => {
+                const assetConfig = SUPPORTED_ASSETS.find(a => a.id === asset.assetId);
+                const currentPrice = marketPrices[asset.assetId] || 0;
+                
+                const totalBuyValue = asset.amount * asset.buyPrice;
+                const totalCurrentValueItem = asset.amount * currentPrice;
+                const pnl = totalCurrentValueItem - totalBuyValue;
+                const pnlPercent = totalBuyValue > 0 ? (pnl / totalBuyValue) * 100 : 0;
+
+                totalInvested += totalBuyValue;
+                totalCurrentValue += totalCurrentValueItem;
+
+                const row = document.createElement('tr');
+                const imgHtml = asset.image 
+                    ? `<img src="${asset.image}" class="asset-img" alt="asset">` 
+                    : `<div class="asset-img" style="display:flex;align-items:center;justify-content:center;font-size:10px;color:#777;">-</div>`;
+
+                const formatMoney = (num) => num.toLocaleString('fa-IR');
+                const pnlClass = pnl >= 0 ? 'profit' : 'loss';
+                const pnlSign = pnl >= 0 ? '+' : '';
+
+                row.innerHTML = `
+                    <td>${imgHtml}</td>
+                    <td>${assetConfig ? assetConfig.name : asset.assetId}</td>
+                    <td>${asset.amount.toLocaleString('fa-IR')}</td>
+                    <td>${formatMoney(asset.buyPrice)}</td>
+                    <td>${currentPrice > 0 ? formatMoney(currentPrice) : '...'}</td>
+                    <td>${formatMoney(totalCurrentValueItem)}</td>
+                    <td class="${pnlClass}">${pnlSign}${formatMoney(pnl)}</td>
+                    <td class="${pnlClass}">${pnlSign}${pnlPercent.toFixed(2)}٪</td>
+                    <td><button class="btn-delete" onclick="deleteAsset(${asset.id})">حذف</button></td>
+                `;
+                assetsTableBody.appendChild(row);
+            });
+
+            updatePnlBox(totalCurrentValue, totalInvested);
+        }
+
+        function updatePnlBox(current, invested) {
+            const pnl = current - invested;
+            const pnlPercent = invested > 0 ? (pnl / invested) * 100 : 0;
+            const pnlClass = pnl >= 0 ? 'profit' : 'loss';
+            const pnlSign = pnl >= 0 ? '+' : '';
+
+            document.getElementById('totalCurrentValue').textContent = current.toLocaleString('fa-IR');
+            document.getElementById('totalInvested').textContent = invested.toLocaleString('fa-IR');
+            
+            const pnlEl = document.getElementById('totalPnl');
+            pnlEl.textContent = `${pnlSign}${pnl.toLocaleString('fa-IR')}`;
+            pnlEl.className = `stat-value ${pnlClass}`;
+
+            const percentEl = document.getElementById('totalPercent');
+            percentEl.textContent = `${pnlSign}${pnlPercent.toFixed(2)}٪`;
+            percentEl.className = `stat-value ${pnlClass}`;
+        }
+
+        // --- بک‌آپ ---
+        document.getElementById('btnBackup').addEventListener('click', () => {
+            const dataStr = JSON.stringify(assets, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `assets_backup_${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('فایل پشتیبان دانلود شد');
+        });
+
+        document.getElementById('btnUploadTrigger').addEventListener('click', () => fileUpload.click());
+
+        fileUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const importedAssets = JSON.parse(event.target.result);
+                    if (Array.isArray(importedAssets)) {
+                        assets = [...assets, ...importedAssets];
+                        saveAssetsToStorage();
+                        renderTable();
+                        showToast('فایل بارگذاری و داده‌ها ترکیب شدند');
+                    } else {
+                        showToast('فرمت فایل نامعتبر است');
+                    }
+                } catch (err) {
+                    showToast('خطا در خواندن فایل');
+                }
+                fileUpload.value = '';
+            };
+            reader.readAsText(file);
+        });
+    </script>
+</body>
+</html>

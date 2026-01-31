@@ -106,11 +106,128 @@ input:focus, select:focus { border-color:var(--accent); }
   text-align:center;
 }
 .modal h3 { color:var(--accent); margin-top:0; }
+/* --- تنظیمات کلی هدر --- */
+header {
+    position: fixed; /* هدر همیشه در بالای صفحه ثابت می‌ماند */
+    top: 0;
+    width: 100%;
+    z-index: 1000; /* برای اینکه روی سایر المان‌ها قرار گیرد */
+    padding: 20px 0;
+    transition: 0.4s; /* انیمیشن نرم برای تغییر حالت */
+    background: transparent; /* در حالت عادی پس‌زمینه شفاف است */
+}
+
+/* استایل هدر وقتی کاربر اسکرول می‌کند (کلاس scrolled توسط JS اضافه می‌شود) */
+header.scrolled {
+    background: var(--glass-bg); /* پس‌زمینه شیشه‌ای تیره */
+    backdrop-filter: blur(12px); /* تاری کردن پشت هدر */
+    border-bottom: 1px solid var(--border-color);
+    padding: 10px 0; /* کاهش ارتفاع هدر هنگام اسکرول */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+/* کانتینر وسط‌چین برای لوگو و منو */
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between; /* لوگو راست، منو چپ (در حالت RTL) */
+    align-items: center;
+    padding: 0 20px;
+}
+
+/* --- استایل لوگو --- */
+.logo {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--accent); /* رنگ طلایی */
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: 0.3s;
+}
+
+.logo span { 
+    color: white; 
+}
+
+.logo:hover {
+    color: var(--accent-hover);
+    transform: scale(1.02);
+}
+
+/* --- استایل منو --- */
+nav ul {
+    display: flex;
+    list-style: none;
+    gap: 30px; /* فاصله بین آیتم‌های منو */
+    margin: 0;
+    padding: 0;
+}
+
+nav a {
+    color: var(--text-main);
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.3s;
+    position: relative;
+    padding-bottom: 5px;
+}
+
+nav a:hover { 
+    color: var(--accent); 
+}
+
+/* خط زیرین متحرک برای لینک‌ها */
+nav a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    right: 0; /* شروع از راست به چپ */
+    background: var(--accent);
+    transition: 0.3s;
+}
+
+nav a:hover::after { 
+    width: 100%; 
+}
+
+/* --- واکنش‌گرا برای موبایل --- */
+@media (max-width: 768px) {
+    .nav-container { 
+        flex-direction: column; 
+        gap: 15px; 
+    }
+    nav ul { 
+        gap: 15px; 
+        font-size: 0.9rem; 
+        flex-wrap: wrap; 
+        justify-content: center;
+    }
+}
 </style>
 </head>
 <body>
-
-<div class="container">
+    <!-- هدر -->
+    <header id="mainHeader">
+      <div class="nav-container">
+          <a href="#" class="logo">📈 <span>بومی‌ترید</span></a>
+          <nav>
+              <ul>
+                  <li><a href="#stats">آمار عملکرد</a></li>
+                  <li><a href="add.html">اضافه کردن معامله</a></li>
+                  <li><a href="data.html">معاملات</a></li>
+                  <li><a href="scalpCalc.html">ماشین حساب</a></li>
+                  <li><a href="vloume.html">مدیریت حجم</a></li>
+                  <li><a href="assetManagement.html">مدیریت دارایی</a></li>
+              </ul>
+          </nav>
+      </div>
+  </header>
+<div class="container" style="margin-top: 100px;">
 <div class="card">
   <h1>ماشین حساب حجم پیشرفته</h1>
   
@@ -376,6 +493,15 @@ function uploadSettings(input) {
   reader.readAsText(file);
   input.value = '';
 }
+// مدیریت تغییر استایل هدر هنگام اسکرول
+window.addEventListener('scroll', () => {
+    const header = document.getElementById('mainHeader');
+    if (window.scrollY > 50) {
+        header.classList.add('scrolled');
+    } else {
+        header.classList.remove('scrolled');
+    }
+});
 </script>
 
 </body>
