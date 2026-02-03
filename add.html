@@ -91,7 +91,6 @@
             border-color: var(--accent);
             box-shadow: 0 0 8px rgba(212, 175, 55, 0.2);
         }
-        /* استایل دکمه‌های بالا/پایین */
         .input-wrapper {
             position: relative;
             display: flex;
@@ -126,7 +125,6 @@
             background: var(--accent);
             color: black;
         }
-        /* دکمه سود/ضرر */
         .toggle-container {
             display: flex;
             background-color: var(--input-bg);
@@ -165,9 +163,9 @@
         .toggle-container:not(.loss) .text-loss { color: var(--text-muted); }
         .toggle-container.loss .text-profit { color: var(--text-muted); }
 
-        /* --- استایل جدید برای دکمه ارزش خط (۱۱.۵ / ۲۳) --- */
+        /* استایل دکمه ارزش خط */
         .toggle-container.line-mode .toggle-bg {
-            background-color: #9c27b0; /* رنگ بنفش برای حالت ۱۱.۵ */
+            background-color: #9c27b0; /* بنفش برای ۱۱.۵ */
             transform: translateX(-100%);
         }
         .toggle-container.line-mode .text-11500 { color: white; }
@@ -262,7 +260,6 @@
             text-align: left;
             direction: ltr;
         }
-        /* --- استایل‌های جدید برای آپلود عکس --- */
         .image-upload-wrapper {
             border: 2px dashed #444;
             border-radius: 8px;
@@ -279,7 +276,7 @@
         }
         .image-preview-container {
             margin-top: 10px;
-            display: none; /* پیش‌فرض مخفی */
+            display: none;
             position: relative;
         }
         .image-preview-container img {
@@ -322,7 +319,6 @@
             transform: scale(1.1);
             border-color: var(--accent);
         }
-        /* --- استایل‌های کول‌آپ (Lightbox) --- */
         .lightbox {
             display: none;
             position: fixed;
@@ -365,119 +361,110 @@
             from {transform:scale(0)}
             to {transform:scale(1)}
         }
-        /* --- تنظیمات کلی هدر --- */
-header {
-    position: fixed; /* هدر همیشه در بالای صفحه ثابت می‌ماند */
-    top: 0;
-    width: 100%;
-    z-index: 1000; /* برای اینکه روی سایر المان‌ها قرار گیرد */
-    padding: 20px 0;
-    transition: 0.4s; /* انیمیشن نرم برای تغییر حالت */
-    background: transparent; /* در حالت عادی پس‌زمینه شفاف است */
-}
-/* استایل هدر وقتی کاربر اسکرول می‌کند (کلاس scrolled توسط JS اضافه می‌شود) */
-header.scrolled {
-    background: var(--glass-bg); /* پس‌زمینه شیشه‌ای تیره */
-    backdrop-filter: blur(12px); /* تاری کردن پشت هدر */
-    border-bottom: 1px solid var(--border-color);
-    padding: 10px 0; /* کاهش ارتفاع هدر هنگام اسکرول */
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-}
-/* کانتینر وسط‌چین برای لوگو و منو */
-.nav-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between; /* لوگو راست، منو چپ (در حالت RTL) */
-    align-items: center;
-    padding: 0 20px;
-}
-/* --- استایل لوگو --- */
-.logo {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: var(--accent); /* رنگ طلایی */
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: 0.3s;
-}
-.logo span {
-    color: white;
-}
-.logo:hover {
-    color: var(--accent-hover);
-    transform: scale(1.02);
-}
-/* --- استایل منو --- */
-nav ul {
-    display: flex;
-    list-style: none;
-    gap: 30px; /* فاصله بین آیتم‌های منو */
-    margin: 0;
-    padding: 0;
-}
-nav a {
-    color: var(--text-main);
-    text-decoration: none;
-    font-weight: 500;
-    transition: 0.3s;
-    position: relative;
-    padding-bottom: 5px;
-}
-nav a:hover {
-    color: var(--accent);
-}
-/* خط زیرین متحرک برای لینک‌ها */
-nav a::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 2px;
-    bottom: 0;
-    right: 0; /* شروع از راست به چپ */
-    background: var(--accent);
-    transition: 0.3s;
-}
-nav a:hover::after {
-    width: 100%;
-}
-/* --- واکنش‌گرا برای موبایل --- */
-@media (max-width: 768px) {
-    .nav-container {
-        flex-direction: column;
-        gap: 15px;
-    }
-    nav ul {
-        gap: 15px;
-        font-size: 0.9rem;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-}
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 20px 0;
+            transition: 0.4s;
+            background: transparent;
+        }
+        header.scrolled {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--accent);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+        }
+        .logo span {
+            color: white;
+        }
+        .logo:hover {
+            color: var(--accent-hover);
+            transform: scale(1.02);
+        }
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            margin: 0;
+            padding: 0;
+        }
+        nav a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            position: relative;
+            padding-bottom: 5px;
+        }
+        nav a:hover {
+            color: var(--accent);
+        }
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            right: 0;
+            background: var(--accent);
+            transition: 0.3s;
+        }
+        nav a:hover::after {
+            width: 100%;
+        }
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            nav ul {
+                gap: 15px;
+                font-size: 0.9rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
-        <!-- هدر -->
-        <header id="mainHeader">
-            <div class="nav-container">
-                <a href="#" class="logo">📈 <span>بومی‌ترید</span></a>
-                <nav>
-                    <ul>
-                        <li><a href="#stats">آمار عملکرد</a></li>
-                        <li><a href="add.html">اضافه کردن معامله</a></li>
-                        <li><a href="data.html">معاملات</a></li>
-                        <li><a href="scalpCalc.html">ماشین حساب</a></li>
-                        <li><a href="vloume.html">مدیریت حجم</a></li>
-                        <li><a href="assetManagement.html">مدیریت دارایی</a></li>
-                        <li><a href="cryptoAsset.html">مدیریت دارایی کریپتو</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </header>
+<header id="mainHeader">
+    <div class="nav-container">
+        <a href="#" class="logo">📈 <span>بومی‌ترید</span></a>
+        <nav>
+            <ul>
+                <li><a href="#stats">آمار عملکرد</a></li>
+                <li><a href="add.html">اضافه کردن معامله</a></li>
+                <li><a href="data.html">معاملات</a></li>
+                <li><a href="scalpCalc.html">ماشین حساب</a></li>
+                <li><a href="vloume.html">مدیریت حجم</a></li>
+                <li><a href="assetManagement.html">مدیریت دارایی</a></li>
+                <li><a href="cryptoAsset.html">مدیریت دارایی کریپتو</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
 <div class="container" style="margin-top: 100px;">
-    <!-- بخش فرم -->
     <div class="card">
         <h2>افزودن معامله</h2>
         <form id="tradeForm">
@@ -485,7 +472,6 @@ nav a:hover::after {
                 <label>نماد</label>
                 <input type="text" id="symbol" class="inputFont" value="طلای آبشده" required>
             </div>
-            <!-- فیلد ۱: حجم سرمایه (برای محاسبه تعداد واحد) -->
             <div class="form-group">
                 <label>حجم سرمایه (تومان)</label>
                 <div class="input-wrapper">
@@ -500,7 +486,6 @@ nav a:hover::after {
                 <label>تعداد واحد</label>
                 <input type="number" id="quantity" class="inputFont number-input" step="0.01" placeholder="محاسبه خودکار یا دستی" required>
             </div>
-            <!-- فیلد ۲: نقطه ورود (قیمت) - جدید -->
             <div class="form-group">
                 <label>نقطه ورود (قیمت)</label>
                 <input type="text" id="entryPrice" class="inputFont number-input" placeholder="مثلا: 3,500,000" oninput="calculateProfit()">
@@ -521,7 +506,7 @@ nav a:hover::after {
                 </div>
                 <input type="hidden" id="statusValue" value="profit">
             </div>
-            
+
             <!-- دکمه جدید: انتخاب ارزش خط -->
             <div class="form-group">
                 <label>ارزش هر خط</label>
@@ -546,7 +531,6 @@ nav a:hover::after {
                 <label>مقدار سود/ضرر (تومان) - محاسبه خودکار</label>
                 <input type="text" id="profitAmount" class="inputFont number-input" placeholder="محاسبه می‌شود..." readonly style="background-color: #252525; color: var(--accent); font-weight: bold;">
             </div>
-            <!-- بخش جدید: آپلود عکس -->
             <div class="form-group">
                 <label>تصویر تحلیل (اختیاری)</label>
                 <input type="file" id="tradeImageInput" accept="image/*" style="display: none;" onchange="handleImageUpload(this)">
@@ -570,7 +554,6 @@ nav a:hover::after {
             <input type="file" id="fileInput" accept=".json" onchange="uploadData(this)">
         </div>
     </div>
-    <!-- بخش لیست -->
     <div class="card">
         <h3>لیست معاملات</h3>
         <div class="table-responsive">
@@ -590,7 +573,6 @@ nav a:hover::after {
                 </tr>
                 </thead>
                 <tbody>
-                <!-- ردیف‌ها اینجا اضافه می‌شوند -->
                 </tbody>
             </table>
         </div>
@@ -599,19 +581,15 @@ nav a:hover::after {
         </div>
     </div>
 </div>
-<!-- المان کول‌آپ -->
 <div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
     <span class="close-lightbox" onclick="closeLightbox(event)">&times;</span>
     <img class="lightbox-content" id="lightboxImg">
 </div>
 <script>
-    // --- تنظیمات ---
-    const UNIT_VALUE = 2300000; // ارزش هر واحد (۲,۳۰۰,۰۰۰ تومان)
-    // متغیر LINE_VALUE دیگر ثابت نیست و در اسکریپت مدیریت می‌شود
-    let LINE_VALUE = 23000;   
+    const UNIT_VALUE = 2300000;
+    let LINE_VALUE = 23000;
     let currentImageBase64 = null;
 
-    // --- 1. تبدیل تاریخ میلادی به شمسی ---
     function gregorianToJalali(gy, gm, gd) {
         const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
         let jy = (gy <= 1600) ? 0 : 979;
@@ -634,10 +612,9 @@ nav a:hover::after {
         return `${jalali[0]}/${String(jalali[1]).padStart(2, '0')}/${String(jalali[2]).padStart(2, '0')}`;
     }
 
-    // --- 2. مدیریت وضعیت برنامه ---
     let trades = [];
     let isLoss = false;
-    let isLine11500 = false; // وضعیت جدید برای دکمه خط
+    let isLine11500 = false;
 
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('dateInput').value = getTodayJalali();
@@ -649,7 +626,6 @@ nav a:hover::after {
         setupNumberInputs();
     });
 
-    // --- 3. مدیریت اینپوت‌های عددی ---
     function setupNumberInputs() {
         const inputs = document.querySelectorAll('.number-input');
         inputs.forEach(input => {
@@ -660,11 +636,9 @@ nav a:hover::after {
                 } else {
                     e.target.value = '';
                 }
-                // لاجیک تغییر خودکار تعداد واحد هنگام تغییر حجم سرمایه
                 if (e.target.id === 'capitalAmount') {
                     autoCalculateQuantity(value);
                 }
-                // محاسبه سود اگر قیمت‌ها تغییر کرد
                 if (e.target.id === 'entryPrice' || e.target.id === 'exitPrice' || e.target.id === 'quantity') {
                     calculateProfit();
                 }
@@ -683,7 +657,6 @@ nav a:hover::after {
         });
     }
 
-    // --- 4. محاسبه خودکار تعداد واحد ---
     function autoCalculateQuantity(capitalValue) {
         const quantityInput = document.getElementById('quantity');
         const capital = parseInt(capitalValue);
@@ -695,7 +668,6 @@ nav a:hover::after {
         }
     }
 
-    // --- 5. منطق دکمه سود/ضرر ---
     function toggleStatus() {
         isLoss = !isLoss;
         const container = document.getElementById('statusToggle');
@@ -710,12 +682,11 @@ nav a:hover::after {
         calculateProfit();
     }
 
-    // --- 5.1 منطق دکمه ارزش خط (جدید) ---
     function toggleLineValue() {
         isLine11500 = !isLine11500;
         const container = document.getElementById('lineValueToggle');
         const hiddenInput = document.getElementById('lineValueInput');
-        
+
         if (isLine11500) {
             container.classList.add('line-mode');
             LINE_VALUE = 11500;
@@ -728,7 +699,6 @@ nav a:hover::after {
         calculateProfit();
     }
 
-    // --- 6. تنظیم حجم سرمایه داینامیک ---
     function adjustCapital(amount) {
         const input = document.getElementById('capitalAmount');
         let currentVal = parseInt(input.value.replace(/,/g, '')) || 0;
@@ -738,33 +708,33 @@ nav a:hover::after {
         autoCalculateQuantity(newVal);
     }
 
-    // --- 7. محاسبه سود و ضرر (اصلاح شده و نهایی) ---
+    // --- تابع محاسبه سود اصلاح شده طبق فرمول درخواستی ---
     function calculateProfit() {
         const entryPrice = parseInt(document.getElementById('entryPrice').value.replace(/,/g, '')) || 0;
         const exitPrice = parseInt(document.getElementById('exitPrice').value.replace(/,/g, '')) || 0;
         const quantity = parseFloat(document.getElementById('quantity').value) || 0;
-        const tradeType = document.getElementById('tradeType').value;
-        
+
         let lines = 0;
         let profit = 0;
-
+        let priceDiff = 0
         if (entryPrice > 0 && exitPrice > 0 && quantity > 0) {
-            // 1. محاسبه اختلاف قیمت
-            const priceDiff = exitPrice - entryPrice;
+            // مرحله ۱: محاسبه اختلاف قیمت
+            if (isLoss === true){
+                priceDiff = entryPrice - exitPrice ;
+            }else {
+                priceDiff = exitPrice - entryPrice;
+            }
+            console.log(priceDiff);
 
-            // 2. محاسبه تعداد خط (فقط جهت نمایش)
+            // مرحله ۱ (ادامه): محاسبه تعداد خط بر اساس ارزش خط انتخاب شده
             // فرمول: اختلاف قیمت تقسیم بر ارزش هر خط
-            lines = priceDiff / LINE_VALUE;
+            lines = priceDiff;
 
-            // 3. محاسبه سود/ضرر واقعی
-            // فرمول: تعداد خط * ارزش هر خط * تعداد واحد
-            // یا به عبارتی: اختلاف قیمت * تعداد واحد (که همان فرمول استاندارد است)
-            // اما چون کاربر می‌خواهد بر اساس "خط" حساب کند، ما از LINE_VALUE استفاده می‌کنیم
-            
-            // محاسبه سود بر اساس تعداد خط و ارزش هر خط
+            // مرحله ۲: محاسبه سود
+            // فرمول: تعداد خط * ارزش خط * تعداد واحد
             profit = lines * LINE_VALUE * quantity;
 
-            // 4. اعمال وضعیت دستی کاربر (سود یا ضرر)
+            // اعمال وضعیت دستی کاربر (سود یا ضرر)
             if (isLoss) {
                 profit = -Math.abs(profit);
             } else {
@@ -794,14 +764,12 @@ nav a:hover::after {
         }
     }
 
-    // --- جدید: مدیریت آپلود عکس ---
     function handleImageUpload(input) {
         if (input.files && input.files[0]) {
             const reader = new FileReader();
-            // محدودیت حجم (مثلا 2 مگابایت) برای جلوگیری از پر شدن LocalStorage
             if (input.files[0].size > 2 * 1024 * 1024) {
                 alert('حجم تصویر نباید بیشتر از ۲ مگابایت باشد.');
-                input.value = ''; // پاک کردن اینپوت
+                input.value = '';
                 return;
             }
             reader.onload = function(e) {
@@ -815,13 +783,12 @@ nav a:hover::after {
         }
     }
     function removeImage(event) {
-        event.stopPropagation(); // جلوگیری از باز شدن پنجره انتخاب فایل
+        event.stopPropagation();
         document.getElementById('tradeImageInput').value = '';
         currentImageBase64 = null;
         document.getElementById('imagePreviewContainer').style.display = 'none';
     }
 
-    // --- 8. ثبت معامله ---
     document.getElementById('tradeForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const newTrade = {
@@ -836,37 +803,32 @@ nav a:hover::after {
             status: document.getElementById('statusValue').value,
             profit: document.getElementById('profitAmount').value,
             lines: document.getElementById('linesChanged').value,
-            lineValue: document.getElementById('lineValueInput').value, // ذخیره ارزش خط استفاده شده
-            image: currentImageBase64 // ذخیره عکس
+            lineValue: document.getElementById('lineValueInput').value,
+            image: currentImageBase64
         };
         trades.push(newTrade);
         try {
             localStorage.setItem('goldTrades', JSON.stringify(trades));
             renderTable();
-            // ریست کردن فرم (به جز تاریخ)
             this.reset();
             document.getElementById('dateInput').value = getTodayJalali();
             document.getElementById('statusValue').value = 'profit';
             document.getElementById('statusToggle').classList.remove('loss');
             isLoss = false;
             document.getElementById('profitAmount').style.color = 'var(--accent)';
-            
-            // ریست کردن دکمه ارزش خط به حالت پیش‌فرض (۲۳۰۰۰)
+
             document.getElementById('lineValueInput').value = '23000';
             document.getElementById('lineValueToggle').classList.remove('line-mode');
             isLine11500 = false;
             LINE_VALUE = 23000;
 
-            // ریست کردن بخش عکس
             removeImage({ stopPropagation: () => {} });
         } catch (err) {
             alert('فضای حافظه مرورگر پر شده است. لطفاً تصاویر با حجم کمتر آپلود کنید یا معاملات قدیمی را حذف کنید.');
-            // حذف آخرین آیتم اضافه شده چون ذخیره نشد
             trades.pop();
         }
     });
 
-    // --- 9. رندر کردن جدول ---
     function renderTable() {
         const tbody = document.querySelector('#tradeTable tbody');
         const emptyState = document.getElementById('emptyState');
@@ -876,22 +838,18 @@ nav a:hover::after {
             return;
         }
         emptyState.style.display = 'none';
-        // مرتب‌سازی بر اساس تاریخ (جدیدترین بالا)
         const sortedTrades = [...trades].sort((a, b) => b.id - a.id);
         sortedTrades.forEach(trade => {
             const tr = document.createElement('tr');
             const typeClass = trade.type === 'Long' ? 'badge-long' : 'badge-short';
             const statusClass = trade.status === 'profit' ? 'profit-text' : 'loss-text';
             const statusText = trade.status === 'profit' ? 'سود' : 'ضرر';
-            
-            // سلول تصویر
+
             let imageCell = '<td>-</td>';
             if (trade.image) {
                 imageCell = `<td><img src="${trade.image}" class="table-thumb" onclick="openLightbox('${trade.image}')" alt="تصویر"></td>`;
             }
-            
-            // نمایش ارزش خط در جدول (اختیاری - می‌توانید به عنوان تایتل یا ستون اضافه کنید)
-            // اینجا آن را به عنوان یک ویژگی به ردیف اضافه می‌کنیم تا در صورت نیاز نمایش داده شود
+
             tr.title = `ارزش خط: ${Number(trade.lineValue).toLocaleString()} تومان`;
 
             tr.innerHTML = `
@@ -912,7 +870,6 @@ nav a:hover::after {
         });
     }
 
-    // --- 10. حذف معامله ---
     window.deleteTrade = function(id) {
         if(confirm('آیا از حذف این معامله مطمئن هستید؟')) {
             trades = trades.filter(t => t.id !== id);
@@ -921,7 +878,6 @@ nav a:hover::after {
         }
     };
 
-    // --- 11. دانلود و آپلود ---
     window.downloadData = function() {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(trades));
         const downloadAnchorNode = document.createElement('a');
@@ -948,7 +904,6 @@ nav a:hover::after {
         reader.readAsText(file);
     };
 
-    // --- جدید: توابع کول‌آپ (Lightbox) ---
     function openLightbox(src) {
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightboxImg');
@@ -956,13 +911,11 @@ nav a:hover::after {
         lightboxImg.src = src;
     }
     function closeLightbox(event) {
-        // بستن فقط اگر روی دکمه ضربدر یا پس‌زمینه کلیک شد (نه روی خود عکس)
         if (event.target.id === 'lightbox' || event.target.classList.contains('close-lightbox')) {
             document.getElementById('lightbox').style.display = 'none';
         }
     }
 
-    // مدیریت تغییر استایل هدر هنگام اسکرول
     window.addEventListener('scroll', () => {
         const header = document.getElementById('mainHeader');
         if (window.scrollY > 50) {
