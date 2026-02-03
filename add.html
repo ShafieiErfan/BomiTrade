@@ -44,7 +44,7 @@
         .container {
             width: 100%;
             max-width: 80%;
-            display: grid; 
+            display: grid;
             grid-template-columns: 1fr;
             gap: 20px;
         }
@@ -164,6 +164,17 @@
         .toggle-container:not(.loss) .text-profit { color: white; }
         .toggle-container:not(.loss) .text-loss { color: var(--text-muted); }
         .toggle-container.loss .text-profit { color: var(--text-muted); }
+
+        /* --- استایل جدید برای دکمه ارزش خط (۱۱.۵ / ۲۳) --- */
+        .toggle-container.line-mode .toggle-bg {
+            background-color: #9c27b0; /* رنگ بنفش برای حالت ۱۱.۵ */
+            transform: translateX(-100%);
+        }
+        .toggle-container.line-mode .text-11500 { color: white; }
+        .toggle-container:not(.line-mode) .text-23000 { color: white; }
+        .toggle-container:not(.line-mode) .text-11500 { color: var(--text-muted); }
+        .toggle-container.line-mode .text-23000 { color: var(--text-muted); }
+
         .btn-submit {
             width: 100%;
             padding: 14px;
@@ -251,7 +262,6 @@
             text-align: left;
             direction: ltr;
         }
-
         /* --- استایل‌های جدید برای آپلود عکس --- */
         .image-upload-wrapper {
             border: 2px dashed #444;
@@ -312,7 +322,6 @@
             transform: scale(1.1);
             border-color: var(--accent);
         }
-
         /* --- استایل‌های کول‌آپ (Lightbox) --- */
         .lightbox {
             display: none;
@@ -353,7 +362,7 @@
             color: var(--danger);
         }
         @keyframes zoom {
-            from {transform:scale(0)} 
+            from {transform:scale(0)}
             to {transform:scale(1)}
         }
         /* --- تنظیمات کلی هدر --- */
@@ -366,7 +375,6 @@ header {
     transition: 0.4s; /* انیمیشن نرم برای تغییر حالت */
     background: transparent; /* در حالت عادی پس‌زمینه شفاف است */
 }
-
 /* استایل هدر وقتی کاربر اسکرول می‌کند (کلاس scrolled توسط JS اضافه می‌شود) */
 header.scrolled {
     background: var(--glass-bg); /* پس‌زمینه شیشه‌ای تیره */
@@ -375,7 +383,6 @@ header.scrolled {
     padding: 10px 0; /* کاهش ارتفاع هدر هنگام اسکرول */
     box-shadow: 0 4px 20px rgba(0,0,0,0.5);
 }
-
 /* کانتینر وسط‌چین برای لوگو و منو */
 .nav-container {
     max-width: 1200px;
@@ -385,7 +392,6 @@ header.scrolled {
     align-items: center;
     padding: 0 20px;
 }
-
 /* --- استایل لوگو --- */
 .logo {
     font-size: 1.8rem;
@@ -397,16 +403,13 @@ header.scrolled {
     gap: 10px;
     transition: 0.3s;
 }
-
-.logo span { 
-    color: white; 
+.logo span {
+    color: white;
 }
-
 .logo:hover {
     color: var(--accent-hover);
     transform: scale(1.02);
 }
-
 /* --- استایل منو --- */
 nav ul {
     display: flex;
@@ -415,7 +418,6 @@ nav ul {
     margin: 0;
     padding: 0;
 }
-
 nav a {
     color: var(--text-main);
     text-decoration: none;
@@ -424,11 +426,9 @@ nav a {
     position: relative;
     padding-bottom: 5px;
 }
-
-nav a:hover { 
-    color: var(--accent); 
+nav a:hover {
+    color: var(--accent);
 }
-
 /* خط زیرین متحرک برای لینک‌ها */
 nav a::after {
     content: '';
@@ -440,21 +440,19 @@ nav a::after {
     background: var(--accent);
     transition: 0.3s;
 }
-
-nav a:hover::after { 
-    width: 100%; 
+nav a:hover::after {
+    width: 100%;
 }
-
 /* --- واکنش‌گرا برای موبایل --- */
 @media (max-width: 768px) {
-    .nav-container { 
-        flex-direction: column; 
-        gap: 15px; 
+    .nav-container {
+        flex-direction: column;
+        gap: 15px;
     }
-    nav ul { 
-        gap: 15px; 
-        font-size: 0.9rem; 
-        flex-wrap: wrap; 
+    nav ul {
+        gap: 15px;
+        font-size: 0.9rem;
+        flex-wrap: wrap;
         justify-content: center;
     }
 }
@@ -523,6 +521,18 @@ nav a:hover::after {
                 </div>
                 <input type="hidden" id="statusValue" value="profit">
             </div>
+            
+            <!-- دکمه جدید: انتخاب ارزش خط -->
+            <div class="form-group">
+                <label>ارزش هر خط</label>
+                <div class="toggle-container" id="lineValueToggle" onclick="toggleLineValue()">
+                    <div class="toggle-bg"></div>
+                    <div class="toggle-btn text-23000">۲۳,۰۰۰ تومان</div>
+                    <div class="toggle-btn text-11500">۱۱,۵۰۰ تومان</div>
+                </div>
+                <input type="hidden" id="lineValueInput" value="23000">
+            </div>
+
             <div class="form-group">
                 <label>نقطه خروج (قیمت)</label>
                 <input type="text" id="exitPrice" class="inputFont number-input" placeholder="مثلا: 3,546,000" oninput="calculateProfit()">
@@ -536,7 +546,6 @@ nav a:hover::after {
                 <label>مقدار سود/ضرر (تومان) - محاسبه خودکار</label>
                 <input type="text" id="profitAmount" class="inputFont number-input" placeholder="محاسبه می‌شود..." readonly style="background-color: #252525; color: var(--accent); font-weight: bold;">
             </div>
-            
             <!-- بخش جدید: آپلود عکس -->
             <div class="form-group">
                 <label>تصویر تحلیل (اختیاری)</label>
@@ -549,7 +558,6 @@ nav a:hover::after {
                     <img id="imagePreview" src="" alt="پیش‌نمایش" onclick="openLightbox(this.src)">
                 </div>
             </div>
-
             <div class="form-group">
                 <label>تاریخ (شمسی)</label>
                 <input type="text" id="dateInput" readonly class="inputFont" style="cursor: default; background-color: #252525; color: #888;">
@@ -591,19 +599,16 @@ nav a:hover::after {
         </div>
     </div>
 </div>
-
 <!-- المان کول‌آپ -->
 <div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
     <span class="close-lightbox" onclick="closeLightbox(event)">&times;</span>
     <img class="lightbox-content" id="lightboxImg">
 </div>
-
 <script>
     // --- تنظیمات ---
     const UNIT_VALUE = 2300000; // ارزش هر واحد (۲,۳۰۰,۰۰۰ تومان)
-    const LINE_VALUE = 23000;   // ارزش هر خط (۲۳,۰۰۰ تومان)
-    
-    // متغیر برای نگهداری موقت عکس Base64
+    // متغیر LINE_VALUE دیگر ثابت نیست و در اسکریپت مدیریت می‌شود
+    let LINE_VALUE = 23000;   
     let currentImageBase64 = null;
 
     // --- 1. تبدیل تاریخ میلادی به شمسی ---
@@ -628,9 +633,12 @@ nav a:hover::after {
         const jalali = gregorianToJalali(today.getFullYear(), today.getMonth() + 1, today.getDate());
         return `${jalali[0]}/${String(jalali[1]).padStart(2, '0')}/${String(jalali[2]).padStart(2, '0')}`;
     }
+
     // --- 2. مدیریت وضعیت برنامه ---
     let trades = [];
     let isLoss = false;
+    let isLine11500 = false; // وضعیت جدید برای دکمه خط
+
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('dateInput').value = getTodayJalali();
         const savedData = localStorage.getItem('goldTrades');
@@ -640,6 +648,7 @@ nav a:hover::after {
         }
         setupNumberInputs();
     });
+
     // --- 3. مدیریت اینپوت‌های عددی ---
     function setupNumberInputs() {
         const inputs = document.querySelectorAll('.number-input');
@@ -673,6 +682,7 @@ nav a:hover::after {
             });
         });
     }
+
     // --- 4. محاسبه خودکار تعداد واحد ---
     function autoCalculateQuantity(capitalValue) {
         const quantityInput = document.getElementById('quantity');
@@ -684,6 +694,7 @@ nav a:hover::after {
             quantityInput.value = '';
         }
     }
+
     // --- 5. منطق دکمه سود/ضرر ---
     function toggleStatus() {
         isLoss = !isLoss;
@@ -698,6 +709,25 @@ nav a:hover::after {
         }
         calculateProfit();
     }
+
+    // --- 5.1 منطق دکمه ارزش خط (جدید) ---
+    function toggleLineValue() {
+        isLine11500 = !isLine11500;
+        const container = document.getElementById('lineValueToggle');
+        const hiddenInput = document.getElementById('lineValueInput');
+        
+        if (isLine11500) {
+            container.classList.add('line-mode');
+            LINE_VALUE = 11500;
+            hiddenInput.value = '11500';
+        } else {
+            container.classList.remove('line-mode');
+            LINE_VALUE = 23000;
+            hiddenInput.value = '23000';
+        }
+        calculateProfit();
+    }
+
     // --- 6. تنظیم حجم سرمایه داینامیک ---
     function adjustCapital(amount) {
         const input = document.getElementById('capitalAmount');
@@ -707,40 +737,41 @@ nav a:hover::after {
         input.value = newVal.toLocaleString();
         autoCalculateQuantity(newVal);
     }
+
     // --- 7. محاسبه سود و ضرر (اصلاح شده و نهایی) ---
     function calculateProfit() {
         const entryPrice = parseInt(document.getElementById('entryPrice').value.replace(/,/g, '')) || 0;
         const exitPrice = parseInt(document.getElementById('exitPrice').value.replace(/,/g, '')) || 0;
         const quantity = parseFloat(document.getElementById('quantity').value) || 0;
         const tradeType = document.getElementById('tradeType').value;
+        
         let lines = 0;
         let profit = 0;
+
         if (entryPrice > 0 && exitPrice > 0 && quantity > 0) {
             // 1. محاسبه اختلاف قیمت
             const priceDiff = exitPrice - entryPrice;
+
             // 2. محاسبه تعداد خط (فقط جهت نمایش)
-            // lines = priceDiff / LINE_VALUE;
-            lines = priceDiff
-            // 3. محاسبه سود/ضرر واقعی بر اساس نوع معامله
-            // فرمول: (قیمت خروج - قیمت ورود) * تعداد واحد
-            // اگر لانگ باشد: افزایش قیمت = سود
-            // اگر شورت باشد: کاهش قیمت = سود
-            if (tradeType === 'Long' ) {
-                profit =  (quantity * 23000) * priceDiff;
-            } else {
-                // در شورت، اگر قیمت پایین بیاید (priceDiff منفی)، سود می‌شود.
-                // پس فرمول همان است: priceDiff * quantity
-                profit = (quantity * 23000) * priceDiff;
-            }
+            // فرمول: اختلاف قیمت تقسیم بر ارزش هر خط
+            lines = priceDiff / LINE_VALUE;
+
+            // 3. محاسبه سود/ضرر واقعی
+            // فرمول: تعداد خط * ارزش هر خط * تعداد واحد
+            // یا به عبارتی: اختلاف قیمت * تعداد واحد (که همان فرمول استاندارد است)
+            // اما چون کاربر می‌خواهد بر اساس "خط" حساب کند، ما از LINE_VALUE استفاده می‌کنیم
+            
+            // محاسبه سود بر اساس تعداد خط و ارزش هر خط
+            profit = lines * LINE_VALUE * quantity;
+
             // 4. اعمال وضعیت دستی کاربر (سود یا ضرر)
-            // اگر کاربر گزینه "ضرر" را انتخاب کرده باشد، عدد نهایی باید منفی شود.
-            // اگر "سود" را انتخاب کرده باشد، عدد باید مثبت شود.
             if (isLoss) {
                 profit = -Math.abs(profit);
             } else {
                 profit = Math.abs(profit);
             }
         }
+
         // نمایش تعداد خط
         const linesInput = document.getElementById('linesChanged');
         const linesPreview = document.getElementById('linesPreview');
@@ -751,6 +782,7 @@ nav a:hover::after {
             linesInput.value = '';
             linesPreview.textContent = '';
         }
+
         // نمایش مبلغ سود/ضرر
         const profitInput = document.getElementById('profitAmount');
         if (profit !== 0) {
@@ -766,26 +798,22 @@ nav a:hover::after {
     function handleImageUpload(input) {
         if (input.files && input.files[0]) {
             const reader = new FileReader();
-            
             // محدودیت حجم (مثلا 2 مگابایت) برای جلوگیری از پر شدن LocalStorage
             if (input.files[0].size > 2 * 1024 * 1024) {
                 alert('حجم تصویر نباید بیشتر از ۲ مگابایت باشد.');
                 input.value = ''; // پاک کردن اینپوت
                 return;
             }
-
             reader.onload = function(e) {
                 currentImageBase64 = e.target.result;
                 const previewContainer = document.getElementById('imagePreviewContainer');
                 const previewImg = document.getElementById('imagePreview');
-                
                 previewImg.src = currentImageBase64;
                 previewContainer.style.display = 'block';
             }
             reader.readAsDataURL(input.files[0]);
         }
     }
-
     function removeImage(event) {
         event.stopPropagation(); // جلوگیری از باز شدن پنجره انتخاب فایل
         document.getElementById('tradeImageInput').value = '';
@@ -808,10 +836,10 @@ nav a:hover::after {
             status: document.getElementById('statusValue').value,
             profit: document.getElementById('profitAmount').value,
             lines: document.getElementById('linesChanged').value,
+            lineValue: document.getElementById('lineValueInput').value, // ذخیره ارزش خط استفاده شده
             image: currentImageBase64 // ذخیره عکس
         };
         trades.push(newTrade);
-        
         try {
             localStorage.setItem('goldTrades', JSON.stringify(trades));
             renderTable();
@@ -823,14 +851,21 @@ nav a:hover::after {
             isLoss = false;
             document.getElementById('profitAmount').style.color = 'var(--accent)';
             
+            // ریست کردن دکمه ارزش خط به حالت پیش‌فرض (۲۳۰۰۰)
+            document.getElementById('lineValueInput').value = '23000';
+            document.getElementById('lineValueToggle').classList.remove('line-mode');
+            isLine11500 = false;
+            LINE_VALUE = 23000;
+
             // ریست کردن بخش عکس
-            removeImage({ stopPropagation: () => {} }); 
+            removeImage({ stopPropagation: () => {} });
         } catch (err) {
             alert('فضای حافظه مرورگر پر شده است. لطفاً تصاویر با حجم کمتر آپلود کنید یا معاملات قدیمی را حذف کنید.');
             // حذف آخرین آیتم اضافه شده چون ذخیره نشد
             trades.pop();
         }
     });
+
     // --- 9. رندر کردن جدول ---
     function renderTable() {
         const tbody = document.querySelector('#tradeTable tbody');
@@ -843,7 +878,6 @@ nav a:hover::after {
         emptyState.style.display = 'none';
         // مرتب‌سازی بر اساس تاریخ (جدیدترین بالا)
         const sortedTrades = [...trades].sort((a, b) => b.id - a.id);
-
         sortedTrades.forEach(trade => {
             const tr = document.createElement('tr');
             const typeClass = trade.type === 'Long' ? 'badge-long' : 'badge-short';
@@ -855,6 +889,10 @@ nav a:hover::after {
             if (trade.image) {
                 imageCell = `<td><img src="${trade.image}" class="table-thumb" onclick="openLightbox('${trade.image}')" alt="تصویر"></td>`;
             }
+            
+            // نمایش ارزش خط در جدول (اختیاری - می‌توانید به عنوان تایتل یا ستون اضافه کنید)
+            // اینجا آن را به عنوان یک ویژگی به ردیف اضافه می‌کنیم تا در صورت نیاز نمایش داده شود
+            tr.title = `ارزش خط: ${Number(trade.lineValue).toLocaleString()} تومان`;
 
             tr.innerHTML = `
                 ${imageCell}
@@ -873,6 +911,7 @@ nav a:hover::after {
             tbody.appendChild(tr);
         });
     }
+
     // --- 10. حذف معامله ---
     window.deleteTrade = function(id) {
         if(confirm('آیا از حذف این معامله مطمئن هستید؟')) {
@@ -881,6 +920,7 @@ nav a:hover::after {
             renderTable();
         }
     };
+
     // --- 11. دانلود و آپلود ---
     window.downloadData = function() {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(trades));
@@ -915,23 +955,22 @@ nav a:hover::after {
         lightbox.style.display = 'flex';
         lightboxImg.src = src;
     }
-
     function closeLightbox(event) {
         // بستن فقط اگر روی دکمه ضربدر یا پس‌زمینه کلیک شد (نه روی خود عکس)
         if (event.target.id === 'lightbox' || event.target.classList.contains('close-lightbox')) {
             document.getElementById('lightbox').style.display = 'none';
         }
     }
+
     // مدیریت تغییر استایل هدر هنگام اسکرول
-window.addEventListener('scroll', () => {
-    const header = document.getElementById('mainHeader');
-    if (window.scrollY > 50) {
-        header.classList.add('scrolled');
-    } else {
-        header.classList.remove('scrolled');
-    }
-});
+    window.addEventListener('scroll', () => {
+        const header = document.getElementById('mainHeader');
+        if (window.scrollY > 50) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    });
 </script>
 </body>
-
 </html>
