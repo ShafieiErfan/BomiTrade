@@ -109,7 +109,7 @@
             border-radius: 8px;
             border: 1px solid var(--danger);
             text-align: center;
-            position: relative; /* برای موقعیت دهی دکمه کپی */
+            position: relative;
         }
         .stop-display .label { margin-bottom: 5px; color: #ff8a80; }
         .stop-value {
@@ -151,7 +151,7 @@
         }
         .diff-pos { color: var(--success); }
         .diff-neg { color: var(--danger); }
-
+        
         /* استایل دکمه کپی */
         .copy-btn {
             background: rgba(255, 255, 255, 0.1);
@@ -288,7 +288,6 @@
             </nav>
         </div>
     </header>
-
     <div class="container" style="margin-top: 100px;">
         <div class="card">
             <h1>⚡ ماشین حساب اسکلپ طلا</h1>
@@ -337,14 +336,12 @@
             </div>
         </div>
     </div>
-
     <!-- المان پیام Toast -->
     <div id="toast">کپی شد!</div>
-
     <script>
         // لیست خطوط مورد نظر شما
         const targetLines = [30, 45, 60, 90, 100, 120, 150, 180, 200, 230, 260, 290, 310, 330];
-
+        
         function calculateScalp() {
             const type = document.getElementById('scalpType').value;
             const entry = parseFloat(document.getElementById('scalpEntry').value);
@@ -354,13 +351,13 @@
             
             // پاک کردن جدول قبلی
             tbody.innerHTML = '';
-
+            
             if (!entry || isNaN(entry)) {
                 stopPriceEl.innerText = '-';
                 tbody.innerHTML = '<tr><td colspan="3" style="color:#666; padding: 20px;">برای مشاهده اعداد، قیمت ورود را وارد کنید.</td></tr>';
                 return;
             }
-
+            
             // محاسبه قیمت استاپ
             let stopPrice = 0;
             if (type === 'Long') {
@@ -369,16 +366,16 @@
                 stopPrice = entry + stopLines;
             }
             stopPriceEl.innerText = stopPrice.toLocaleString();
-
+            
             // مرتب کردن خطوط برای نمایش
             const sortedLines = [...targetLines].sort((a, b) => a - b);
-
+            
             // ساخت ردیف‌های جدول
             sortedLines.forEach(lines => {
                 let price = 0;
                 let diff = 0;
                 let isStop = (lines === stopLines);
-
+                
                 if (type === 'Long') {
                     price = entry + lines;
                     diff = lines;
@@ -386,32 +383,36 @@
                     price = entry - lines;
                     diff = -lines;
                 }
-
+                
                 const tr = document.createElement('tr');
                 if (isStop) {
                     tr.className = 'scalp-row-stop';
                 } else {
                     tr.className = 'scalp-row-target';
                 }
-
+                
                 const diffClass = diff >= 0 ? 'diff-pos' : 'diff-neg';
                 const diffSign = diff > 0 ? '+' : '';
-
-                // ساخت دکمه کپی برای ستون خط
-                const lineBtnHtml = `<button class="copy-btn" onclick="copyText(${lines}, 'خط ${lines}')">${lines} 📋</button>`;
-
+                
+                // دکمه کپی برای قیمت (بدون کاما)
+                const priceBtnHtml = `<button class="copy-btn" onclick="copyPrice(${price}, 'قیمت ${price.toLocaleString()}')">کپی</button>`;
+                
                 tr.innerHTML = `
-                    <td>${lineBtnHtml}</td>
-                    <td style="font-weight:bold; color: ${isStop ? 'var(--danger)' : 'white'}">${price.toLocaleString()}</td>
+                    <td>${lines}</td>
+                    <td style="font-weight:bold; color: ${isStop ? 'var(--danger)' : 'white'}">
+                        ${price.toLocaleString()} ${priceBtnHtml}
+                    </td>
                     <td class="${diffClass}">${diffSign}${diff}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
-
-        // تابع کپی کردن متن ساده (مثل اعداد خطوط)
-        function copyText(text, label) {
-            navigator.clipboard.writeText(text).then(() => {
+        
+        // تابع کپی کردن قیمت (بدون کاما)
+        function copyPrice(price, label) {
+            // تبدیل عدد به رشته بدون کاما
+            const textToCopy = price.toString();
+            navigator.clipboard.writeText(textToCopy).then(() => {
                 showToast(`${label} کپی شد`);
             }).catch(err => {
                 console.error('خطا در کپی:', err);
@@ -423,10 +424,8 @@
         function copyToClipboardFromId(elementId, label) {
             const el = document.getElementById(elementId);
             if (!el) return;
-            
             // دریافت متن و حذف کاما برای کپی تمیز
             const textToCopy = el.innerText.replace(/,/g, '');
-            
             navigator.clipboard.writeText(textToCopy).then(() => {
                 showToast(`${label} (بدون کاما) کپی شد`);
             }).catch(err => {
