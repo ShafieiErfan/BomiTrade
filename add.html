@@ -487,10 +487,6 @@
                 <input type="number" id="quantity" class="inputFont number-input" step="0.01" placeholder="محاسبه خودکار یا دستی" required>
             </div>
             <div class="form-group">
-                <label>نقطه ورود (قیمت)</label>
-                <input type="text" id="entryPrice" class="inputFont number-input" placeholder="مثلا: 3,500,000" oninput="calculateProfit()">
-            </div>
-            <div class="form-group">
                 <label>نوع معامله</label>
                 <select id="tradeType" class="inputFont" onchange="calculateProfit()">
                     <option value="Long" class="inputFont">لانگ (خرید)</option>
@@ -517,7 +513,10 @@
                 </div>
                 <input type="hidden" id="lineValueInput" value="23000">
             </div>
-
+            <div class="form-group">
+                <label>نقطه ورود (قیمت)</label>
+                <input type="text" id="entryPrice" class="inputFont number-input" placeholder="مثلا: 3,500,000" oninput="calculateProfit()">
+            </div>
             <div class="form-group">
                 <label>نقطه خروج (قیمت)</label>
                 <input type="text" id="exitPrice" class="inputFont number-input" placeholder="مثلا: 3,546,000" oninput="calculateProfit()">
@@ -927,3 +926,4 @@
 </script>
 </body>
 </html>
+
