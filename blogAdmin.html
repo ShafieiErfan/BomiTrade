@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت محتوای آموزشی - بومی‌ترید</title>
+    <style>
+        /* --- استفاده از فونت و متغیرهای مشابه اصلی --- */
+        @font-face {
+            font-family: 'Estedad';
+            src: url('fonts/Estedad-Black.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --input-bg: #2c2c2c;
+            --text-main: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --accent: #d4af37;
+            --accent-hover: #f9ce4e;
+            --success: #00c853;
+            --danger: #ff3d00;
+            --border-radius: 12px;
+            --glass-bg: rgba(30, 30, 30, 0.85);
+            --border-color: #333;
+        }
+
+        * { box-sizing: border-box; outline: none; }
+        
+        body {
+            font-family: 'Estedad', sans-serif; /* فونت فال‌بک اضافه شد */
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            padding-top: 100px; /* فضای خالی برای هدر فیکس */
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        /* --- استایل هدر (مشابه اصلی) --- */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 20px 0;
+            transition: 0.4s;
+            background: transparent;
+        }
+        header.scrolled {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--accent);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo span { color: white; }
+        
+        /* --- کارت‌ها و فرم --- */
+        .card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            border: 1px solid #333;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        h2 { margin-top: 0; color: var(--accent); border-bottom: 1px solid #333; padding-bottom: 10px; }
+        h3 { color: white; margin-bottom: 15px; font-size: 1.1rem; }
+
+        .form-group { margin-bottom: 20px; }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        input[type="text"], 
+        textarea {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid #444;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: 0.3s;
+            resize: vertical;
+        }
+
+        input[type="text"]:focus, 
+        textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+        }
+
+        /* --- آپلود فایل --- */
+        .file-upload-wrapper {
+            border: 2px dashed #444;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            background: rgba(255,255,255,0.02);
+        }
+        .file-upload-wrapper:hover {
+            border-color: var(--accent);
+            background: rgba(212, 175, 55, 0.05);
+        }
+        input[type="file"] { display: none; }
+
+        /* --- مدیریت پاراگراف‌ها --- */
+        .paragraphs-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .paragraph-item {
+            background: #252525;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            position: relative;
+        }
+        .btn-remove {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        .btn-add {
+            background: transparent;
+            border: 1px dashed var(--accent);
+            color: var(--accent);
+            padding: 10px;
+            width: 100%;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+        .btn-add:hover { background: rgba(212, 175, 55, 0.1); }
+
+        /* --- گالری تصاویر --- */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .gallery-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #444;
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .gallery-remove {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        .gallery-remove:hover { background: var(--danger); }
+
+        /* --- دکمه‌ها --- */
+        .action-bar {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: inherit;
+            transition: 0.2s;
+            flex: 1;
+            font-size: 1rem;
+        }
+        .btn-primary { background: var(--accent); color: #000; }
+        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); }
+        .btn-outline { background: transparent; border: 1px solid #555; color: #ccc; }
+        .btn-outline:hover { border-color: var(--text-main); color: var(--text-main); }
+
+        /* --- پیش‌نمایش هدر --- */
+        .header-preview {
+            width: 100%;
+            height: 200px;
+            background-color: #000;
+            border-radius: 8px;
+            margin-top: 10px;
+            overflow: hidden;
+            display: none; /* پیش‌فرض مخفی */
+            position: relative;
+        }
+        .header-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .preview-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- هدر -->
+    <header id="mainHeader">
+        <div class="nav-container">
+            <a href="index.html" class="logo">📝 <span>مدیریت وبلاگ</span></a>
+            <nav>
+                <ul style="display: flex; list-style: none; gap: 20px; margin: 0; padding: 0;">
+                    <li><a href="index.html" style="color: var(--text-main); text-decoration: none;">بازگشت به داشبورد</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- فرم اصلی -->
+        <div class="card">
+            <h2>✍️ ایجاد مقاله آموزشی جدید</h2>
+            
+            <!-- عنوان -->
+            <div class="form-group">
+                <label>عنوان مقاله</label>
+                <input type="text" id="postTitle" placeholder="مثلاً: آموزش مدیریت ریسک در معاملات طلا">
+            </div>
+
+            <!-- تصویر هدر -->
+            <div class="form-group">
+                <label>تصویر هدر (Cover Image)</label>
+                <div class="file-upload-wrapper" onclick="document.getElementById('headerInput').click()">
+                    <span style="color: var(--accent);">📷 کلیک کنید برای انتخاب تصویر هدر</span>
+                    <input type="file" id="headerInput" accept="image/*" onchange="handleHeaderUpload(this)">
+                </div>
+                <div id="headerPreview" class="header-preview">
+                    <div class="preview-placeholder">پیش‌نمایش تصویر هدر</div>
+                </div>
+            </div>
+
+            <!-- بدنه متن -->
+            <div class="form-group">
+                <label>متن بدنه مقاله (پاراگراف‌بندی شده)</label>
+                <div id="paragraphsContainer" class="paragraphs-container">
+                    <!-- پاراگراف‌ها اینجا اضافه می‌شوند -->
+                </div>
+                <button class="btn-add" onclick="addParagraph()">+ افزودن پاراگراف جدید</button>
+            </div>
+
+            <!-- نتیجه‌گیری -->
+            <div class="form-group">
+                <label>نتیجه‌گیری و جمع‌بندی</label>
+                <textarea id="postConclusion" rows="4" placeholder="خلاصه نکات کلیدی و نتیجه‌گیری مقاله..."></textarea>
+            </div>
+
+            <!-- گالری تصاویر -->
+            <div class="form-group">
+                <label>گالری تصاویر تکمیلی</label>
+                <div class="file-upload-wrapper" onclick="document.getElementById('galleryInput').click()">
+                    <span style="color: var(--text-muted);">🖼️ افزودن تصویر به گالری</span>
+                    <input type="file" id="galleryInput" accept="image/*" multiple onchange="handleGalleryUpload(this)">
+                </div>
+                <div id="galleryGrid" class="gallery-grid"></div>
+            </div>
+
+            <!-- دکمه‌های عملیات -->
+            <div class="action-bar">
+                <button class="btn btn-outline" onclick="resetForm()">پاک کردن فرم</button>
+                <button class="btn btn-primary" onclick="generateJSON()">📥 خروجی JSON و دانلود</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- متغیرهای سراسری ---
+        let headerImageBase64 = null;
+        let galleryImagesBase64 = [];
+
+        // --- مدیریت هدر اسکرول ---
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('mainHeader');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // --- مدیریت تصویر هدر ---
+        function handleHeaderUpload(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    headerImageBase64 = e.target.result;
+                    const preview = document.getElementById('headerPreview');
+                    preview.style.display = 'block';
+                    preview.innerHTML = `<img src="${headerImageBase64}" alt="Header Preview">`;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // --- مدیریت پاراگراف‌ها ---
+        function addParagraph() {
+            const container = document.getElementById('paragraphsContainer');
+            const index = container.children.length + 1;
+            
+            const div = document.createElement('div');
+            div.className = 'paragraph-item';
+            div.innerHTML = `
+                <button class="btn-remove" onclick="this.parentElement.remove()" title="حذف پاراگراف">×</button>
+                <label style="font-size:0.8rem; color:var(--accent)">پاراگراف ${index}</label>
+                <textarea class="para-text" rows="3" placeholder="متن پاراگراف را وارد کنید..."></textarea>
+            `;
+            container.appendChild(div);
+        }
+
+        // --- مدیریت گالری تصاویر ---
+        function handleGalleryUpload(input) {
+            if (input.files) {
+                Array.from(input.files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const imgData = e.target.result;
+                        galleryImagesBase64.push(imgData);
+                        renderGallery();
+                    }
+                    reader.readAsDataURL(file);
+                });
+            }
+            // ریست کردن اینپوت برای اینکه بتوانیم همان فایل را دوباره انتخاب کنیم (اگر خواستیم)
+            input.value = '';
+        }
+
+        function renderGallery() {
+            const grid = document.getElementById('galleryGrid');
+            grid.innerHTML = '';
+            galleryImagesBase64.forEach((src, idx) => {
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+                item.innerHTML = `
+                    <img src="${src}">
+                    <button class="gallery-remove" onclick="removeGalleryImage(${idx})">×</button>
+                `;
+                grid.appendChild(item);
+            });
+        }
+
+        function removeGalleryImage(index) {
+            galleryImagesBase64.splice(index, 1);
+            renderGallery();
+        }
+
+        // --- تولید و دانلود JSON ---
+        function generateJSON() {
+            const title = document.getElementById('postTitle').value.trim();
+            const conclusion = document.getElementById('postConclusion').value.trim();
+            
+            // جمع‌آوری پاراگراف‌ها
+            const paragraphs = [];
+            document.querySelectorAll('.para-text').forEach(textarea => {
+                if(textarea.value.trim()) {
+                    paragraphs.push(textarea.value.trim());
+                }
+            });
+
+            // اعتبارسنجی ساده
+            if (!title) {
+                alert('لطفاً عنوان مقاله را وارد کنید.');
+                return;
+            }
+            if (paragraphs.length === 0) {
+                alert('لطفاً حداقل یک پاراگراف برای متن مقاله بنویسید.');
+                return;
+            }
+
+            // ساخت آبجکت JSON
+            const blogData = {
+                id: Date.now(), // شناسه یکتا بر اساس زمان
+                title: title,
+                date: new Date().toLocaleDateString('fa-IR'), // تاریخ شمسی
+                headerImage: headerImageBase64,
+                content: paragraphs,
+                conclusion: conclusion,
+                gallery: galleryImagesBase64
+            };
+
+            // تبدیل به رشته JSON
+            const jsonString = JSON.stringify(blogData, null, 2);
+
+            // ایجاد لینک دانلود
+            const blob = new Blob([jsonString], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `blog_${title.replace(/\s+/g, '_')}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            alert('فایل JSON با موفقیت ساخته و دانلود شد!');
+        }
+
+        function resetForm() {
+            if(confirm('آیا مطمئن هستید که می‌خواهید فرم را پاک کنید؟')) {
+                document.getElementById('postTitle').value = '';
+                document.getElementById('postConclusion').value = '';
+                document.getElementById('paragraphsContainer').innerHTML = '';
+                document.getElementById('headerPreview').style.display = 'none';
+                document.getElementById('headerPreview').innerHTML = '<div class="preview-placeholder">پیش‌نمایش تصویر هدر</div>';
+                document.getElementById('galleryGrid').innerHTML = '';
+                headerImageBase64 = null;
+                galleryImagesBase64 = [];
+            }
+        }
+
+        // اضافه کردن یک پاراگراف پیش‌فرض در شروع
+        window.onload = function() {
+            addParagraph();
+        };
+    </script>
+</body>
+</html>
