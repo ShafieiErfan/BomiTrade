@@ -268,6 +268,129 @@
             .nav-container { flex-direction: column; gap: 15px; }
             nav ul { gap: 15px; font-size: 0.9rem; flex-wrap: wrap; justify-content: center; }
         }
+            /* استایل‌های مودال آموزشی */
+    .edu-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85); /* پس‌زمینه تیره */
+        backdrop-filter: blur(5px);
+        z-index: 10000;
+        display: none; /* پیش‌فرض مخفی */
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .edu-modal-overlay.active {
+        display: flex;
+        opacity: 1;
+    }
+
+    .edu-modal-box {
+        background: var(--card-bg);
+        width: 90%;
+        max-width: 600px;
+        max-height: 85vh; /* حداکثر ارتفاع */
+        border-radius: 16px;
+        border: 1px solid var(--accent);
+        box-shadow: 0 0 40px rgba(212, 175, 55, 0.2);
+        display: flex;
+        flex-direction: column;
+        animation: slideUpFade 0.4s ease-out;
+        overflow: hidden; /* برای اینکه اسکرول فقط داخل متن باشد */
+    }
+
+    @keyframes slideUpFade {
+        from { transform: translateY(30px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* هدر مودال */
+    .edu-modal-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid #333;
+        background: rgba(212, 175, 55, 0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0; /* هدر ثابت می‌ماند */
+    }
+
+    .edu-modal-title {
+        color: var(--accent);
+        font-size: 1.4rem;
+        font-weight: bold;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* بدنه مودال (قابل اسکرول) */
+    .edu-modal-body {
+        padding: 25px;
+        overflow-y: auto; /* اسکرول فقط در این بخش فعال است */
+        color: #ddd;
+        font-size: 1rem;
+        line-height: 1.8;
+        text-align: justify;
+    }
+
+    /* استایل پاراگراف‌ها */
+    .edu-modal-body p {
+        margin-bottom: 15px;
+    }
+
+    .edu-modal-body strong {
+        color: white;
+    }
+
+    /* فوتر مودال */
+    .edu-modal-footer {
+        padding: 15px 25px;
+        border-top: 1px solid #333;
+        display: flex;
+        justify-content: flex-end;
+        background: #1a1a1a;
+        flex-shrink: 0; /* فوتر ثابت می‌ماند */
+    }
+
+    .edu-btn {
+        background: var(--accent);
+        color: #000;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 8px;
+        font-family: inherit;
+        font-weight: bold;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .edu-btn:hover {
+        background: var(--accent-hover);
+        transform: translateY(-2px);
+    }
+
+    /* اسکرول بار زیبا برای متن */
+    .edu-modal-body::-webkit-scrollbar {
+        width: 8px;
+    }
+    .edu-modal-body::-webkit-scrollbar-track {
+        background: #1e1e1e;
+    }
+    .edu-modal-body::-webkit-scrollbar-thumb {
+        background: #444;
+        border-radius: 4px;
+    }
+    .edu-modal-body::-webkit-scrollbar-thumb:hover {
+        background: var(--accent);
+    }
     </style>
 </head>
 <body>
@@ -338,6 +461,44 @@
     </div>
     <!-- المان پیام Toast -->
     <div id="toast">کپی شد!</div>
+
+    <!-- المان‌های HTML مودال -->
+<div id="eduModal" class="edu-modal-overlay">
+    <div class="edu-modal-box">
+        <div class="edu-modal-header">
+            <h3 class="edu-modal-title">⚡ راهنمای ماشین حساب اسکلپ</h3>
+            <span onclick="closeEduModal()" style="cursor:pointer; font-size:1.5rem; color:#777;">&times;</span>
+        </div>
+        
+        <div class="edu-modal-body" id="eduModalContent">
+            <p>
+                به ماشین حساب سریع اسکلپ خوش آمدید. این ابزار به طور خاص برای معامله‌گرانی طراحی شده که با سرعت بالا در بازار طلا (mazane) وارد معامله می‌شوند و نیاز به محاسبه لحظه‌ای قیمت‌ها دارند.
+            </p>
+            <p>
+                <strong>۱. انتخاب نوع معامله:</strong> ابتدا مشخص کنید که معامله شما "لانگ" (خرید) است یا "شورت" (فروش). این انتخاب بسیار مهم است زیرا فرمول محاسبه قیمت‌ها در این دو حالت متفاوت است.
+            </p>
+            <p>
+                <strong>۲. وارد کردن قیمت ورود:</strong> قیمت دقیقی که قصد دارید روی آن پوزیشن باز کنید را در فیلد مربوطه وارد کنید. به محض وارد کردن عدد، جدول سمت چپ به صورت خودکار آپدیت می‌شود.
+            </p>
+            <p>
+                <strong>۳. تنظیم فاصله استاپ:</strong> در کادر "فاصله استاپ (خط)"، تعداد پیپی که حاضرید ریسک کنید را وارد کنید (مثلاً ۳۰ پیپ). سیستم به صورت خودکار قیمت استاپ لاس شما را محاسبه کرده و با رنگ قرمز در بالای جدول نمایش می‌دهد.
+            </p>
+            <p>
+                <strong>۴. استفاده از دکمه کپی:</strong> برای سرعت بخشیدن به کار، جلوی هر قیمت و همچنین جلوی قیمت استاپ لاس، دکمه‌ای با عنوان "کپی" قرار داده شده است. با کلیک روی این دکمه، عدد قیمت (بدون کاما) در کلیپ‌بورد شما ذخیره می‌شود تا بتوانید آن را سریع در متاتریدر یا پلتفرم معاملاتی خود Paste کنید.
+            </p>
+            <p>
+                <strong>۵. جدول خطوط:</strong> در جدول زیر، قیمت‌های تارگت بر اساس خطوط از پیش تعیین شده (۳۰، ۴۵، ۶۰ و ...) محاسبه شده‌اند. ستون وسط قیمت نهایی و ستون سمت راست اختلاف آن از قیمت ورود را نشان می‌دهد.
+            </p>
+            <p>
+                ⚠️ <strong>نکته مهم:</strong> همیشه قبل از ورود به معامله، دقت کنید که نوع معامله (لانگ/شورت) را درست انتخاب کرده باشید، زیرا انتخاب اشتباه باعث می‌شود استاپ و تارگت‌ها برعکس محاسبه شوند.
+            </p>
+        </div>
+
+        <div class="edu-modal-footer">
+            <button class="edu-btn" onclick="closeEduModal()">متوجه شدم</button>
+        </div>
+    </div>
+</div>
     <script>
         // لیست خطوط مورد نظر شما
         const targetLines = [30, 45, 60, 90, 100, 120, 150, 180, 200, 230, 260, 290, 310, 330];
@@ -451,6 +612,35 @@
                 header.classList.remove('scrolled');
             }
         });
+         // --- تنظیمات ---
+    // نام یکتای صفحه برای اینکه هر صفحه راهنمای خودش را داشته باشد
+    const PAGE_ID = "scalpCalc_guide"; 
+
+document.addEventListener('DOMContentLoaded', () => {
+    // بررسی اینکه آیا کاربر قبلاً این راهنما را دیده است یا خیر
+    const hasSeenGuide = localStorage.getItem(`edu_seen_${PAGE_ID}`);
+    
+    // اگر ندیده، نمایش بده
+    if (!hasSeenGuide) {
+        // کمی تاخیر برای لود شدن کامل صفحه
+        setTimeout(() => {
+            openEduModal();
+        }, 500);
+    }
+});
+
+function openEduModal() {
+    document.getElementById('eduModal').classList.add('active');
+    document.body.style.overflow = 'hidden'; // جلوگیری از اسکرول صفحه اصلی
+}
+
+function closeEduModal() {
+    document.getElementById('eduModal').classList.remove('active');
+    document.body.style.overflow = 'auto'; // فعال کردن اسکرول صفحه اصلی
+    
+    // ذخیره در حافظه مرورگر که دیگر نشان داده نشود
+    localStorage.setItem(`edu_seen_${PAGE_ID}`, 'true');
+}
     </script>
 </body>
 </html>

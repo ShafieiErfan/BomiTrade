@@ -278,6 +278,129 @@
         ::-webkit-scrollbar-track { background: var(--bg-color); }
         ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #555; }
+            /* استایل‌های مودال آموزشی */
+    .edu-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85); /* پس‌زمینه تیره */
+        backdrop-filter: blur(5px);
+        z-index: 10000;
+        display: none; /* پیش‌فرض مخفی */
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .edu-modal-overlay.active {
+        display: flex;
+        opacity: 1;
+    }
+
+    .edu-modal-box {
+        background: var(--card-bg);
+        width: 90%;
+        max-width: 600px;
+        max-height: 85vh; /* حداکثر ارتفاع */
+        border-radius: 16px;
+        border: 1px solid var(--accent);
+        box-shadow: 0 0 40px rgba(212, 175, 55, 0.2);
+        display: flex;
+        flex-direction: column;
+        animation: slideUpFade 0.4s ease-out;
+        overflow: hidden; /* برای اینکه اسکرول فقط داخل متن باشد */
+    }
+
+    @keyframes slideUpFade {
+        from { transform: translateY(30px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* هدر مودال */
+    .edu-modal-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid #333;
+        background: rgba(212, 175, 55, 0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0; /* هدر ثابت می‌ماند */
+    }
+
+    .edu-modal-title {
+        color: var(--accent);
+        font-size: 1.4rem;
+        font-weight: bold;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* بدنه مودال (قابل اسکرول) */
+    .edu-modal-body {
+        padding: 25px;
+        overflow-y: auto; /* اسکرول فقط در این بخش فعال است */
+        color: #ddd;
+        font-size: 1rem;
+        line-height: 1.8;
+        text-align: justify;
+    }
+
+    /* استایل پاراگراف‌ها */
+    .edu-modal-body p {
+        margin-bottom: 15px;
+    }
+
+    .edu-modal-body strong {
+        color: white;
+    }
+
+    /* فوتر مودال */
+    .edu-modal-footer {
+        padding: 15px 25px;
+        border-top: 1px solid #333;
+        display: flex;
+        justify-content: flex-end;
+        background: #1a1a1a;
+        flex-shrink: 0; /* فوتر ثابت می‌ماند */
+    }
+
+    .edu-btn {
+        background: var(--accent);
+        color: #000;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 8px;
+        font-family: inherit;
+        font-weight: bold;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .edu-btn:hover {
+        background: var(--accent-hover);
+        transform: translateY(-2px);
+    }
+
+    /* اسکرول بار زیبا برای متن */
+    .edu-modal-body::-webkit-scrollbar {
+        width: 8px;
+    }
+    .edu-modal-body::-webkit-scrollbar-track {
+        background: #1e1e1e;
+    }
+    .edu-modal-body::-webkit-scrollbar-thumb {
+        background: #444;
+        border-radius: 4px;
+    }
+    .edu-modal-body::-webkit-scrollbar-thumb:hover {
+        background: var(--accent);
+    }
     </style>
 </head>
 <body>
@@ -375,7 +498,40 @@
     <span class="close-modal">&times;</span>
     <img class="modal-content" id="modalImg">
 </div>
+<!-- المان‌های HTML مودال آموزشی -->
+<div id="eduModal" class="edu-modal-overlay">
+    <div class="edu-modal-box">
+        <div class="edu-modal-header">
+            <h3 class="edu-modal-title">₿ راهنمای مدیریت ترید اسپات</h3>
+            <span onclick="closeEduModal()" style="cursor:pointer; font-size:1.5rem; color:#777;">&times;</span>
+        </div>
+        
+        <div class="edu-modal-body" id="eduModalContent">
+            <p>
+                به سیستم ثبت معاملات اسپات (Spot Trading) خوش آمدید. این ابزار برای ثبت معاملات بلندمدت و نقدی ارزهای دیجیتال طراحی شده است.
+            </p>
+            <p>
+                <strong>۱. ثبت معامله:</strong> در فرم سمت راست، نام ارز (مثلاً BTC)، نوع معامله (خرید یا فروش) و قیمت‌های ورود و خروج را به دلار وارد کنید. سیستم به صورت خودکار درصد سود یا ضرر شما را محاسبه می‌کند.
+            </p>
+            <p>
+                <strong>۲. محاسبه درصد سود:</strong> فرمول محاسبه به این صورت است که اگر "خرید" کرده‌اید، تفاوت قیمت خروج و ورود تقسیم بر قیمت ورود، و اگر "فروش" کرده‌اید، تفاوت قیمت ورود و خروج تقسیم بر قیمت ورود محاسبه می‌شود.
+            </p>
+            <p>
+                <strong>۳. ضمیمه تصویر:</strong> می‌توانید اسکرین‌شات تحلیل تکنیکال یا نمودار معامله را آپلود کنید. با کلیک روی تصویر کوچک در جدول، می‌توانید آن را با اندازه بزرگ مشاهده کنید.
+            </p>
+            <p>
+                <strong>۴. آمار کلی:</strong> در بالای جدول، "درصد سود/ضرر خالص کل" نمایش داده می‌شود. این عدد بر اساس فرمول سود مرکب محاسبه می‌شود و نشان می‌دهد که اگر با تمام سرمایه وارد تمام معاملات می‌شدید، الان چقدر سود یا ضرر داشتید.
+            </p>
+            <p>
+                <strong>۵. پشتیبان‌گیری:</strong> حتماً به صورت دوره‌ای از دکمه "خروجی JSON" استفاده کنید تا از اطلاعات خود نسخه پشتیبان داشته باشید.
+            </p>
+        </div>
 
+        <div class="edu-modal-footer">
+            <button class="edu-btn" onclick="closeEduModal()">متوجه شدم</button>
+        </div>
+    </div>
+</div>
 <script>
     let trades = JSON.parse(localStorage.getItem('cryptoTrades')) || [];
     let currentImageBase64 = null;
@@ -566,6 +722,35 @@
     // اجرای اولیه
     renderTrades();
     calculateTotalProfit();
+     // --- تنظیمات ---
+    // نام یکتای صفحه برای اینکه هر صفحه راهنمای خودش را داشته باشد
+    const PAGE_ID = "cryptoAsset_guide"; 
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // بررسی اینکه آیا کاربر قبلاً این راهنما را دیده است یا خیر
+        const hasSeenGuide = localStorage.getItem(`edu_seen_${PAGE_ID}`);
+        
+        // اگر ندیده، نمایش بده
+        if (!hasSeenGuide) {
+            // کمی تاخیر برای لود شدن کامل صفحه
+            setTimeout(() => {
+                openEduModal();
+            }, 500);
+        }
+    });
+
+    function openEduModal() {
+        document.getElementById('eduModal').classList.add('active');
+        document.body.style.overflow = 'hidden'; // جلوگیری از اسکرول صفحه اصلی
+    }
+
+    function closeEduModal() {
+        document.getElementById('eduModal').classList.remove('active');
+        document.body.style.overflow = 'auto'; // فعال کردن اسکرول صفحه اصلی
+        
+        // ذخیره در حافظه مرورگر که دیگر نشان داده نشود
+        localStorage.setItem(`edu_seen_${PAGE_ID}`, 'true');
+    }
 </script>
 
 </body>

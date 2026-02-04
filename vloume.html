@@ -208,6 +208,129 @@ nav a:hover::after {
         justify-content: center;
     }
 }
+    /* استایل‌های مودال آموزشی */
+    .edu-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85); /* پس‌زمینه تیره */
+        backdrop-filter: blur(5px);
+        z-index: 10000;
+        display: none; /* پیش‌فرض مخفی */
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .edu-modal-overlay.active {
+        display: flex;
+        opacity: 1;
+    }
+
+    .edu-modal-box {
+        background: var(--card-bg);
+        width: 90%;
+        max-width: 600px;
+        max-height: 85vh; /* حداکثر ارتفاع */
+        border-radius: 16px;
+        border: 1px solid var(--accent);
+        box-shadow: 0 0 40px rgba(212, 175, 55, 0.2);
+        display: flex;
+        flex-direction: column;
+        animation: slideUpFade 0.4s ease-out;
+        overflow: hidden; /* برای اینکه اسکرول فقط داخل متن باشد */
+    }
+
+    @keyframes slideUpFade {
+        from { transform: translateY(30px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* هدر مودال */
+    .edu-modal-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid #333;
+        background: rgba(212, 175, 55, 0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0; /* هدر ثابت می‌ماند */
+    }
+
+    .edu-modal-title {
+        color: var(--accent);
+        font-size: 1.4rem;
+        font-weight: bold;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* بدنه مودال (قابل اسکرول) */
+    .edu-modal-body {
+        padding: 25px;
+        overflow-y: auto; /* اسکرول فقط در این بخش فعال است */
+        color: #ddd;
+        font-size: 1rem;
+        line-height: 1.8;
+        text-align: justify;
+    }
+
+    /* استایل پاراگراف‌ها */
+    .edu-modal-body p {
+        margin-bottom: 15px;
+    }
+
+    .edu-modal-body strong {
+        color: white;
+    }
+
+    /* فوتر مودال */
+    .edu-modal-footer {
+        padding: 15px 25px;
+        border-top: 1px solid #333;
+        display: flex;
+        justify-content: flex-end;
+        background: #1a1a1a;
+        flex-shrink: 0; /* فوتر ثابت می‌ماند */
+    }
+
+    .edu-btn {
+        background: var(--accent);
+        color: #000;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 8px;
+        font-family: inherit;
+        font-weight: bold;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .edu-btn:hover {
+        background: var(--accent-hover);
+        transform: translateY(-2px);
+    }
+
+    /* اسکرول بار زیبا برای متن */
+    .edu-modal-body::-webkit-scrollbar {
+        width: 8px;
+    }
+    .edu-modal-body::-webkit-scrollbar-track {
+        background: #1e1e1e;
+    }
+    .edu-modal-body::-webkit-scrollbar-thumb {
+        background: #444;
+        border-radius: 4px;
+    }
+    .edu-modal-body::-webkit-scrollbar-thumb:hover {
+        background: var(--accent);
+    }
 </style>
 </head>
 <body>
@@ -301,7 +424,43 @@ nav a:hover::after {
     <button class="btn btn-primary" style="width:100%" onclick="saveInitialCapital()">شروع</button>
   </div>
 </div>
+<!-- المان‌های HTML مودال آموزشی -->
+<div id="eduModal" class="edu-modal-overlay">
+  <div class="edu-modal-box">
+      <div class="edu-modal-header">
+          <h3 class="edu-modal-title">📊 راهنمای مدیریت حجم پیشرفته</h3>
+          <span onclick="closeEduModal()" style="cursor:pointer; font-size:1.5rem; color:#777;">&times;</span>
+      </div>
+      
+      <div class="edu-modal-body" id="eduModalContent">
+          <p>
+              به ماشین حساب مدیریت حجم پیشرفته خوش آمدید. این ابزار برای محافظت از سرمایه شما در برابر سری‌های باخت (تیلت) طراحی شده است و با استفاده از منطق "مارجین + ریسک" کار می‌کند.
+          </p>
+          <p>
+              <strong>۱. ارزش هر واحد پایه:</strong> قیمت خرید یک واحد کامل از سهم یا طلا را وارد کنید. این عدد مبنای محاسبات شماست.
+          </p>
+          <p>
+              <strong>۲. مقدار استاپ لاس:</strong> مبلغی که با بستن یک واحد، ضرر می‌کنید را وارد کنید. دقت کنید که این عدد "تومان" است، نه پیپ.
+          </p>
+          <p>
+              <strong>۳. تحمل استاپ پشت سر هم:</strong> این بخش نشان می‌دهد سیستم تا چند استاپ متوالی را برای شما در نظر می‌گیرد. اگر روی "۳ استاپ" تنظیم کنید، سیستم طوری حجم را محاسبه می‌کند که اگر ۳ معامله پشت سر هم با استاپ بسته شدید، همچنان سرمایه کافی برای خرید مجدد در همان حجم قبلی را داشته باشید.
+          </p>
+          <p>
+              <strong>۴. همگام‌سازی با ژورنال:</strong> اگر در صفحه اصلی معاملات ثبت کرده‌اید، با کلیک روی این دکمه، سود و ضررهای شما با سرمایه اولیه جمع شده و سرمایه به‌روز رسانی می‌شود.
+          </p>
+          <p>
+              <strong>۵. نتیجه محاسبه:</strong> عددی که به عنوان "تعداد واحد پیشنهادی" نمایش داده می‌شود، امن‌ترین حجمی است که می‌توانید وارد شوید. اگر رنگ این عدد قرمز باشد، یعنی سرمایه شما برای حجم‌های بزرگتر کافی نیست و سیستم به صورت خودکار حجم را کاهش داده تا شما در امان بمانید.
+          </p>
+          <p>
+              💾 <strong>پشتیبان‌گیری:</strong> می‌توانید تنظیمات فعلی خود را دانلود کنید تا در آینده یا روی دستگاه دیگر آن‌ها را آپلود کنید.
+          </p>
+      </div>
 
+      <div class="edu-modal-footer">
+          <button class="edu-btn" onclick="closeEduModal()">متوجه شدم</button>
+      </div>
+  </div>
+</div>
 <script>
 const els = {
   baseUnitValue: document.getElementById('baseUnitValue'),
@@ -503,6 +662,35 @@ window.addEventListener('scroll', () => {
         header.classList.remove('scrolled');
     }
 });
+ // --- تنظیمات ---
+    // نام یکتای صفحه برای اینکه هر صفحه راهنمای خودش را داشته باشد
+    const PAGE_ID = "vloume_guide"; 
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // بررسی اینکه آیا کاربر قبلاً این راهنما را دیده است یا خیر
+        const hasSeenGuide = localStorage.getItem(`edu_seen_${PAGE_ID}`);
+        
+        // اگر ندیده، نمایش بده
+        if (!hasSeenGuide) {
+            // کمی تاخیر برای لود شدن کامل صفحه
+            setTimeout(() => {
+                openEduModal();
+            }, 500);
+        }
+    });
+
+    function openEduModal() {
+        document.getElementById('eduModal').classList.add('active');
+        document.body.style.overflow = 'hidden'; // جلوگیری از اسکرول صفحه اصلی
+    }
+
+    function closeEduModal() {
+        document.getElementById('eduModal').classList.remove('active');
+        document.body.style.overflow = 'auto'; // فعال کردن اسکرول صفحه اصلی
+        
+        // ذخیره در حافظه مرورگر که دیگر نشان داده نشود
+        localStorage.setItem(`edu_seen_${PAGE_ID}`, 'true');
+    }
 </script>
 
 </body>

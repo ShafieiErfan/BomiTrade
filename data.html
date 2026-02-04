@@ -330,6 +330,129 @@
             from {transform:scale(0.9); opacity: 0;} 
             to {transform:scale(1); opacity: 1;}
         }
+            /* استایل‌های مودال آموزشی */
+    .edu-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85); /* پس‌زمینه تیره */
+        backdrop-filter: blur(5px);
+        z-index: 10000;
+        display: none; /* پیش‌فرض مخفی */
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .edu-modal-overlay.active {
+        display: flex;
+        opacity: 1;
+    }
+
+    .edu-modal-box {
+        background: var(--card-bg);
+        width: 90%;
+        max-width: 600px;
+        max-height: 85vh; /* حداکثر ارتفاع */
+        border-radius: 16px;
+        border: 1px solid var(--accent);
+        box-shadow: 0 0 40px rgba(212, 175, 55, 0.2);
+        display: flex;
+        flex-direction: column;
+        animation: slideUpFade 0.4s ease-out;
+        overflow: hidden; /* برای اینکه اسکرول فقط داخل متن باشد */
+    }
+
+    @keyframes slideUpFade {
+        from { transform: translateY(30px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* هدر مودال */
+    .edu-modal-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid #333;
+        background: rgba(212, 175, 55, 0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0; /* هدر ثابت می‌ماند */
+    }
+
+    .edu-modal-title {
+        color: var(--accent);
+        font-size: 1.4rem;
+        font-weight: bold;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* بدنه مودال (قابل اسکرول) */
+    .edu-modal-body {
+        padding: 25px;
+        overflow-y: auto; /* اسکرول فقط در این بخش فعال است */
+        color: #ddd;
+        font-size: 1rem;
+        line-height: 1.8;
+        text-align: justify;
+    }
+
+    /* استایل پاراگراف‌ها */
+    .edu-modal-body p {
+        margin-bottom: 15px;
+    }
+
+    .edu-modal-body strong {
+        color: white;
+    }
+
+    /* فوتر مودال */
+    .edu-modal-footer {
+        padding: 15px 25px;
+        border-top: 1px solid #333;
+        display: flex;
+        justify-content: flex-end;
+        background: #1a1a1a;
+        flex-shrink: 0; /* فوتر ثابت می‌ماند */
+    }
+
+    .edu-btn {
+        background: var(--accent);
+        color: #000;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 8px;
+        font-family: inherit;
+        font-weight: bold;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .edu-btn:hover {
+        background: var(--accent-hover);
+        transform: translateY(-2px);
+    }
+
+    /* اسکرول بار زیبا برای متن */
+    .edu-modal-body::-webkit-scrollbar {
+        width: 8px;
+    }
+    .edu-modal-body::-webkit-scrollbar-track {
+        background: #1e1e1e;
+    }
+    .edu-modal-body::-webkit-scrollbar-thumb {
+        background: #444;
+        border-radius: 4px;
+    }
+    .edu-modal-body::-webkit-scrollbar-thumb:hover {
+        background: var(--accent);
+    }
         /* --- تنظیمات کلی هدر --- */
 header {
     position: fixed; /* هدر همیشه در بالای صفحه ثابت می‌ماند */
@@ -483,7 +606,7 @@ nav a:hover::after {
         </div>
     </div>
     <!-- بخش مدیریت سرمایه -->
-    <div class="card">
+    <!-- <div class="card">
         <h3 style="margin:0 0 15px 0; color:white;">ماشین حساب مدیریت سرمایه</h3>
         <div class="mm-grid">
             <div class="mm-input-group">
@@ -504,7 +627,7 @@ nav a:hover::after {
                 <div id="mmWarning" class="risk-warning"></div>
             </div>
         </div>
-    </div>
+    </div> -->
     <!-- بخش آمار پیشرفته -->
     <div class="card">
         <h3 style="margin:0 0 15px 0; color:white;">تحلیل عمیق و روانشناسی بازار</h3>
@@ -616,6 +739,35 @@ nav a:hover::after {
 <div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
     <span class="close-lightbox" onclick="closeLightbox(event)">&times;</span>
     <img class="lightbox-content" id="lightboxImg">
+</div>
+<!-- المان‌های HTML مودال -->
+<div id="eduModal" class="edu-modal-overlay">
+    <div class="edu-modal-box">
+        <div class="edu-modal-header">
+            <h3 class="edu-modal-title">📘 راهنمای استفاده از صفحه</h3>
+            <!-- دکمه ضربدر کوچک (اختیاری) -->
+            <span onclick="closeEduModal()" style="cursor:pointer; font-size:1.5rem; color:#777;">&times;</span>
+        </div>
+        
+        <div class="edu-modal-body" id="eduModalContent">
+            <!-- متن‌های خود را اینجا قرار دهید -->
+            <p>
+                <strong>۱.  تحلیل هوشمند:</strong> این بخش با توجه به عملکرد شما در معاملات بهتون نشون میده که در جهت لانگ عملکرد بهتری داشتید یا شورت
+            </p>
+            <br>
+            <p>
+                <strong>۲.    تحلیل عمیق و روانشناسی بازار:</strong> این بخش که توضیحات خاصی نیاز نداره فقط بخش ضریب سود به ضرر هست که بر اساس معاملات شما هر چه عدد به 1 نزدیک تر شود نشان از عملکرد ضعیف شما در معاملات دارد هر چه بالاتر باشد به معنی عملکرد خوب و مناسب شماست
+            </p>
+            <br>
+            <p>
+                <strong>۳. نمودار عملکرد کلی:</strong>به صورت نمودار به شما عملکرد و بالا و پایین شدن حساب شما رو نشون میده
+            </p> 
+        </div>
+
+        <div class="edu-modal-footer">
+            <button class="edu-btn" onclick="closeEduModal()">متوجه شدم</button>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -1250,6 +1402,35 @@ window.addEventListener('scroll', () => {
         header.classList.remove('scrolled');
     }
 });
+ // --- تنظیمات ---
+    // نام یکتای صفحه برای اینکه هر صفحه راهنمای خودش را داشته باشد
+    const PAGE_ID = "data_guide"; 
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // بررسی اینکه آیا کاربر قبلاً این راهنما را دیده است یا خیر
+        const hasSeenGuide = localStorage.getItem(`edu_seen_${PAGE_ID}`);
+        
+        // اگر ندیده، نمایش بده
+        if (!hasSeenGuide) {
+            // کمی تاخیر برای لود شدن کامل صفحه
+            setTimeout(() => {
+                openEduModal();
+            }, 500);
+        }
+    });
+
+    function openEduModal() {
+        document.getElementById('eduModal').classList.add('active');
+        document.body.style.overflow = 'hidden'; // جلوگیری از اسکرول صفحه اصلی
+    }
+
+    function closeEduModal() {
+        document.getElementById('eduModal').classList.remove('active');
+        document.body.style.overflow = 'auto'; // فعال کردن اسکرول صفحه اصلی
+        
+        // ذخیره در حافظه مرورگر که دیگر نشان داده نشود
+        localStorage.setItem(`edu_seen_${PAGE_ID}`, 'true');
+    }
 </script>
 </body>
 
