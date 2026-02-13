@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>افزودن معامله کریپتو - بومی‌ترید</title>
+    <style>
+        @font-face {
+            font-family: 'Estedad';
+            src: url('fonts/Estedad-Black.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --input-bg: #2c2c2c;
+            --text-main: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --accent: #d4af37;
+            --accent-hover: #b5952f;
+            --success: #00c853;
+            --danger: #ff3d00;
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+        * { box-sizing: border-box; outline: none; }
+        body {
+            font-family: 'Estedad', 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .card {
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid #333;
+        }
+        h2 { margin-top: 0; color: var(--accent); text-align: center; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.9rem; }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--input-bg);
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            transition: var(--transition);
+            font-family: 'Estedad', sans-serif;
+        }
+        input:focus, select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.2);
+        }
+        /* استایل Toggle */
+        .toggle-container {
+            display: flex;
+            background-color: var(--input-bg);
+            border-radius: 8px;
+            padding: 4px;
+            position: relative;
+            cursor: pointer;
+            border: 1px solid #444;
+        }
+        .toggle-btn {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            z-index: 2;
+            font-weight: bold;
+            transition: color 0.3s;
+            user-select: none;
+        }
+        .toggle-bg {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: calc(50% - 4px);
+            height: calc(100% - 8px);
+            background-color: var(--success);
+            border-radius: 6px;
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            z-index: 1;
+        }
+        .toggle-container.loss .toggle-bg {
+            background-color: var(--danger);
+            transform: translateX(-100%);
+        }
+        .toggle-container.loss .text-loss { color: white; }
+        .toggle-container:not(.loss) .text-profit { color: white; }
+        .toggle-container:not(.loss) .text-loss { color: var(--text-muted); }
+        .toggle-container.loss .text-profit { color: var(--text-muted); }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--accent);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+        }
+        .btn-submit:hover { background-color: var(--accent-hover); transform: translateY(-2px); }
+        
+        .file-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .btn-outline {
+            flex: 1;
+            padding: 10px;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            text-align: center;
+        }
+        .btn-outline:hover { background: rgba(212, 175, 55, 0.1); }
+        
+        /* استایل آپلود تصویر */
+        .image-upload-wrapper {
+            border: 2px dashed #444;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            background-color: rgba(255,255,255,0.02);
+        }
+        .image-upload-wrapper:hover {
+            border-color: var(--accent);
+            background-color: rgba(212, 175, 55, 0.05);
+        }
+        .image-preview-container {
+            margin-top: 10px;
+            display: none;
+            position: relative;
+            text-align: center;
+        }
+        .image-preview-container img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            cursor: zoom-in;
+            display: block;
+            margin: 0 auto;
+        }
+        .remove-image-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+        .remove-image-btn:hover { background: #d32f2f; transform: scale(1.1); }
+
+        /* هدر */
+        header {
+            position: fixed; top: 0; width: 100%; z-index: 1000; padding: 20px 0; transition: 0.4s; background: transparent;
+        }
+        header.scrolled {
+            background: rgba(18, 18, 18, 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid #333; padding: 10px 0;
+        }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+        .logo { font-size: 1.8rem; font-weight: bold; color: var(--accent); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .logo span { color: white; }
+        nav ul { display: flex; list-style: none; gap: 20px; margin: 0; padding: 0; }
+        nav a { color: var(--text-main); text-decoration: none; font-weight: 500; transition: 0.3s; }
+        nav a:hover { color: var(--accent); }
+
+        /* مودال */
+        .edu-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); z-index: 10000;
+            display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease;
+        }
+        .edu-modal-overlay.active { display: flex; opacity: 1; }
+        .edu-modal-box {
+            background: var(--card-bg); width: 90%; max-width: 600px; max-height: 85vh;
+            border-radius: 16px; border: 1px solid var(--accent);
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+        .edu-modal-header { padding: 20px; border-bottom: 1px solid #333; background: rgba(212, 175, 55, 0.05); display: flex; justify-content: space-between; align-items: center; }
+        .edu-modal-title { color: var(--accent); font-size: 1.4rem; font-weight: bold; margin: 0; }
+        .edu-modal-body { padding: 25px; overflow-y: auto; color: #ddd; line-height: 1.8; }
+        .edu-modal-footer { padding: 15px; border-top: 1px solid #333; display: flex; justify-content: flex-end; background: #1a1a1a; }
+        .edu-btn { background: var(--accent); color: #000; border: none; padding: 10px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+<header id="mainHeader">
+    <div class="nav-container">
+        <a href="index.html" class="logo">₿ <span>کریپتو ژورنال</span></a>
+        <nav>
+            <ul>
+                <li><a href="crypto-data.html">مشاهده معاملات</a></li>
+                <li><a href="index.html">بازگشت به خانه</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<div class="container" style="margin-top: 100px;">
+    <div class="card">
+        <h2>افزودن معامله کریپتو</h2>
+        <form id="cryptoForm">
+            <div class="form-group">
+                <label>نماد (مثلاً BTC/USDT)</label>
+                <input type="text" id="symbol" class="inputFont" placeholder="BTC/USDT" required>
+            </div>
+            
+            <div class="form-group">
+                <label>اهرم (Leverage)</label>
+                <input type="number" id="leverage" class="inputFont" placeholder="مثلاً 10 یا 20" value="1" min="1" required>
+            </div>
+
+            <div class="form-group">
+                <label>سرمایه (دلار)</label>
+                <input type="number" id="capital" class="inputFont" placeholder="مثلاً 1000" step="any" required>
+            </div>
+
+            <div class="form-group">
+                <label>حجم (Lot / Unit)</label>
+                <input type="number" id="volume" class="inputFont" placeholder="مثلاً 0.5" step="any" required>
+            </div>
+
+            <div class="form-group">
+                <label>نوع معامله</label>
+                <select id="type" class="inputFont">
+                    <option value="Long">لانگ (Long)</option>
+                    <option value="Short">شورت (Short)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>وضعیت معامله</label>
+                <div class="toggle-container" id="statusToggle" onclick="toggleStatus()">
+                    <div class="toggle-bg"></div>
+                    <div class="toggle-btn text-profit">سود</div>
+                    <div class="toggle-btn text-loss">ضرر</div>
+                </div>
+                <input type="hidden" id="status" value="profit">
+            </div>
+
+            <div class="form-group">
+                <label>مقدار سود یا ضرر (دلار)</label>
+                <input type="number" id="pnl" class="inputFont" placeholder="محاسبه خودکار یا دستی" step="any" required>
+                <small style="color: #666; font-size: 0.8rem;">اگر ضرر است عدد منفی وارد کنید یا تگ ضرر را انتخاب کنید.</small>
+            </div>
+
+            <div class="form-group">
+                <label>تصویر تحلیل (اختیاری)</label>
+                <input type="file" id="tradeImageInput" accept="image/*" style="display: none;" onchange="handleImageUpload(this)">
+                <div class="image-upload-wrapper" onclick="document.getElementById('tradeImageInput').click()">
+                    <span style="color: var(--text-muted); font-size: 0.9rem;">برای انتخاب تصویر کلیک کنید</span>
+                </div>
+                <div class="image-preview-container" id="imagePreviewContainer">
+                    <button type="button" class="remove-image-btn" onclick="removeImage(event)">×</button>
+                    <img id="imagePreview" src="" alt="پیش‌نمایش" onclick="openLightbox(this.src)">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>تاریخ (شمسی)</label>
+                <input type="text" id="dateInput" readonly style="background-color: #252525; color: #888; cursor: default;">
+            </div>
+
+            <button style="font-family: Estedad;" type="submit" class="btn-submit">ثبت معامله</button>
+        </form>
+
+        <div class="file-controls">
+            <button class="btn-outline" style="font-family: Estedad;" onclick="downloadData()">💾 دانلود خروجی (JSON)</button>
+            <button class="btn-outline" style="font-family: Estedad;" onclick="document.getElementById('fileInput').click()">📂 آپلود و ادغام فایل‌ها</button>
+            <input type="file" style="display: none;" id="fileInput" accept=".json" multiple onchange="uploadMultipleFiles(this)">
+        </div>
+    </div>
+</div>
+
+<!-- مودال آموزشی -->
+<div id="eduModal" class="edu-modal-overlay">
+    <div class="edu-modal-box">
+        <div class="edu-modal-header">
+            <h3 class="edu-modal-title">📘 راهنمای کریپتو</h3>
+            <span onclick="closeEduModal()" style="cursor:pointer; font-size:1.5rem; color:#777;">&times;</span>
+        </div>
+        <div class="edu-modal-body">
+            <p><strong>۱. واحد پول:</strong> تمام مقادیر در این بخش به <strong>دلار</strong> هستند.</p>
+            <p><strong>۲. اهرم (Leverage):</strong> اهرم معامله را وارد کنید. این مقدار در محاسبات و نمایش کارت ذخیره می‌شود.</p>
+            <p><strong>۳. حجم (Volume):</strong> تعداد کوین یا قرارداد (Lot) را وارد کنید.</p>
+            <p><strong>۴. آپلود چندگانه:</strong> با استفاده از دکمه آپلود، می‌توانید چندین فایل JSON را همزمان انتخاب کنید. سیستم به صورت هوشمند تمام معاملات موجود در فایل‌ها را با معاملات فعلی ادغام (Merge) می‌کند.</p>
+        </div>
+        <div class="edu-modal-footer">
+            <button class="edu-btn" onclick="closeEduModal()">متوجه شدم</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let trades = [];
+    let isLoss = false;
+    let currentImageBase64 = null;
+
+    function gregorianToJalali(gy, gm, gd) {
+        const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+        let jy = (gy <= 1600) ? 0 : 979;
+        gy -= (gy <= 1600) ? 621 : 1600;
+        const gy2 = (gm > 2) ? (gy + 1) : gy;
+        let days = (365 * gy) + parseInt((gy2 + 3) / 4) - parseInt((gy2 + 99) / 100) + parseInt((gy2 + 399) / 400) - 80 + gd + g_d_m[gm - 1];
+        jy += 33 * parseInt(days / 12053);
+        days %= 12053;
+        jy += 4 * parseInt(days / 1461);
+        days %= 1461;
+        jy += parseInt((days - 1) / 365);
+        if (days > 365) days = (days - 1) % 365;
+        const jm = (days < 186) ? 1 + parseInt(days / 31) : 7 + parseInt((days - 186) / 30);
+        const jd = 1 + ((days < 186) ? (days % 31) : ((days - 186) % 30));
+        return [jy, jm, jd];
+    }
+
+    function getTodayJalali() {
+        const today = new Date();
+        const jalali = gregorianToJalali(today.getFullYear(), today.getMonth() + 1, today.getDate());
+        return `${jalali[0]}/${String(jalali[1]).padStart(2, '0')}/${String(jalali[2]).padStart(2, '0')}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('dateInput').value = getTodayJalali();
+        const savedData = localStorage.getItem('cryptoTrades');
+        if (savedData) {
+            trades = JSON.parse(savedData);
+        }
+        
+        const PAGE_ID = "crypto_add_guide";
+        if (!localStorage.getItem(`edu_seen_${PAGE_ID}`)) {
+            setTimeout(() => { document.getElementById('eduModal').classList.add('active'); }, 500);
+        }
+    });
+
+    function toggleStatus() {
+        isLoss = !isLoss;
+        const container = document.getElementById('statusToggle');
+        const hiddenInput = document.getElementById('status');
+        const pnlInput = document.getElementById('pnl');
+        
+        if (isLoss) {
+            container.classList.add('loss');
+            hiddenInput.value = 'loss';
+            let val = parseFloat(pnlInput.value);
+            if (val > 0) pnlInput.value = -val;
+        } else {
+            container.classList.remove('loss');
+            hiddenInput.value = 'profit';
+            let val = parseFloat(pnlInput.value);
+            if (val < 0) pnlInput.value = -val;
+        }
+    }
+
+    document.getElementById('pnl').addEventListener('input', function(e) {
+        const val = parseFloat(e.target.value);
+        const container = document.getElementById('statusToggle');
+        const hiddenInput = document.getElementById('status');
+        
+        if (!isNaN(val)) {
+            if (val < 0) {
+                container.classList.add('loss');
+                hiddenInput.value = 'loss';
+                isLoss = true;
+            } else {
+                container.classList.remove('loss');
+                hiddenInput.value = 'profit';
+                isLoss = false;
+            }
+        }
+    });
+
+    // مدیریت تصویر
+    function handleImageUpload(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            if (file.size > 2 * 1024 * 1024) {
+                alert('حجم تصویر نباید بیشتر از ۲ مگابایت باشد.');
+                input.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentImageBase64 = e.target.result;
+                const previewContainer = document.getElementById('imagePreviewContainer');
+                const previewImg = document.getElementById('imagePreview');
+                previewImg.src = currentImageBase64;
+                previewContainer.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function removeImage(event) {
+        event.stopPropagation();
+        document.getElementById('tradeImageInput').value = '';
+        currentImageBase64 = null;
+        document.getElementById('imagePreviewContainer').style.display = 'none';
+    }
+
+    function openLightbox(src) {
+        const lightbox = document.createElement('div');
+        lightbox.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 2000; display: flex;
+            justify-content: center; align-items: center; cursor: zoom-out;
+        `;
+        const img = document.createElement('img');
+        img.src = src;
+        img.style.cssText = `max-width: 90%; max-height: 90%; border-radius: 8px; border: 1px solid #444;`;
+        lightbox.appendChild(img);
+        document.body.appendChild(lightbox);
+        lightbox.onclick = function() {
+            document.body.removeChild(lightbox);
+        };
+    }
+
+    document.getElementById('cryptoForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const pnlVal = parseFloat(document.getElementById('pnl').value);
+        const statusVal = pnlVal >= 0 ? 'profit' : 'loss';
+
+        const newTrade = {
+            id: Date.now(),
+            date: document.getElementById('dateInput').value,
+            symbol: document.getElementById('symbol').value.toUpperCase(),
+            leverage: document.getElementById('leverage').value,
+            capital: parseFloat(document.getElementById('capital').value),
+            volume: parseFloat(document.getElementById('volume').value),
+            type: document.getElementById('type').value,
+            status: statusVal,
+            pnl: pnlVal,
+            image: currentImageBase64
+        };
+
+        trades.push(newTrade);
+        localStorage.setItem('cryptoTrades', JSON.stringify(trades));
+        
+        alert('معامله با موفقیت ذخیره شد.');
+        this.reset();
+        document.getElementById('dateInput').value = getTodayJalali();
+        removeImage({ stopPropagation: () => {} });
+        
+        isLoss = false;
+        document.getElementById('statusToggle').classList.remove('loss');
+        document.getElementById('status').value = 'profit';
+        document.getElementById('leverage').value = '1'; // ریست اهرم
+    });
+
+    window.downloadData = function() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(trades));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "crypto_trades_backup.json");
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    };
+
+    window.uploadMultipleFiles = function(input) {
+        if (input.files.length === 0) return;
+        let loadedCount = 0;
+        let totalNewTrades = 0;
+
+        Array.from(input.files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const newTrades = JSON.parse(e.target.result);
+                    if (Array.isArray(newTrades)) {
+                        trades = [...trades, ...newTrades];
+                        totalNewTrades += newTrades.length;
+                    }
+                } catch (err) { console.error("Error reading file", err); }
+                
+                loadedCount++;
+                if (loadedCount === input.files.length) {
+                    localStorage.setItem('cryptoTrades', JSON.stringify(trades));
+                    alert(`${totalNewTrades} معامله از ${input.files.length} فایل با موفقیت ادغام شد.`);
+                    input.value = '';
+                }
+            };
+            reader.readAsText(file);
+        });
+    };
+
+    function closeEduModal() {
+        document.getElementById('eduModal').classList.remove('active');
+        localStorage.setItem('edu_seen_crypto_add_guide', 'true');
+    }
+    
+    window.addEventListener('scroll', () => {
+        const header = document.getElementById('mainHeader');
+        if (window.scrollY > 50) header.classList.add('scrolled');
+        else header.classList.remove('scrolled');
+    });
+</script>
+</body>
+</html>
